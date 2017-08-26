@@ -3,6 +3,7 @@ package testapp.silencertestapp;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -12,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -77,6 +79,16 @@ public class MainActivity extends AppCompatActivity {
     public void add(View view) {
         if (!wifiName.getText().toString().equals("")) {
             //items.add(Array[wifiName.getText().toString()][start.getText().toString()][end.getText().toString()])
+
+            //---------inserting into DB----------
+
+            Locations locations = new Locations(this);
+            locations.openWriteDB();
+            locations.addCondition(wifiName.getText().toString(), Integer.parseInt(start.getText().toString()), Integer.parseInt(end.getText().toString()));
+            locations.closeDB();
+
+            //--------------------------------------
+
             HashMap<String, String> item = new HashMap<>();
             item.put(WIFI_NAME_KEY, wifiName.getText().toString());
             item.put(START_TIME_KEY, start.getText().toString());
@@ -94,6 +106,19 @@ public class MainActivity extends AppCompatActivity {
             wifiName.setText("");
             start.setText("");
             end.setText("");
+
+            locations.openWriteDB();
+            Cursor cursor = locations.getAllItems();
+            cursor.moveToFirst();
+            for (int i = 0; i <cursor.getCount() ; i++) {
+                Log.w("ID", cursor.getLong(0)+"");
+                Log.w("WIFI",cursor.getString(1));
+                Log.w("START", cursor.getInt(2)+"");
+                Log.w("END", cursor.getInt(3)+"");
+                cursor.moveToNext();
+            }
+            cursor.close();
+            locations.closeDB();
 
             //adapter.notifyDataSetChanged();
         }
