@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:weightSum="1">
+
+    <TextView
+        android:id="@+id/wifi_network_listview"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_weight="1.38"
+        android:text="WiFi Name Here"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+
+    <TextView
+        android:id="@+id/start_listview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="20dp"
+        android:text="Start"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/end_time_listview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="0dp"
+
+        android:text="End"
+        android:textSize="12sp" />
+</LinearLayout>
