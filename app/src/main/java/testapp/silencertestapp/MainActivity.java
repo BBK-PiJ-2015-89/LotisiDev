@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import java.lang.reflect.Array;
@@ -41,10 +42,13 @@ public class MainActivity extends AppCompatActivity {
     private EditText end;
     private ArrayAdapter<String> adapter;
     private ListView itemList;
+    private Locations locations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        locations.openWriteDB();
 
         setContentView(R.layout.activity_main);
 
@@ -71,7 +75,9 @@ public class MainActivity extends AppCompatActivity {
         itemList = (ListView) findViewById(R.id.item_List);
 
         //adapter = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, items);
-        itemList.setAdapter(adapter);
+        //itemList.setAdapter(adapter);
+        reloadAdapter();
+
 
         //listviewtestend
     }
@@ -82,10 +88,10 @@ public class MainActivity extends AppCompatActivity {
 
             //---------inserting into DB----------
 
-            Locations locations = new Locations(this);
-            locations.openWriteDB();
+            //Locations locations = new Locations(this);
+            //locations.openWriteDB();
             locations.addCondition(wifiName.getText().toString(), Integer.parseInt(start.getText().toString()), Integer.parseInt(end.getText().toString()));
-            locations.closeDB();
+            //locations.closeDB();
 
             //--------------------------------------
 
@@ -98,30 +104,41 @@ public class MainActivity extends AppCompatActivity {
 
             //items.add(new Condition(wifiName.getText().toString(), (Integer.parseInt(start.getText().toString())), (Integer.parseInt(end.getText().toString()))));
             //items.add(wifiName.getText().toString());
-            SimpleAdapter adapter = new SimpleAdapter(this, items,
-                    R.layout.listitem,
-                    new String[]{WIFI_NAME_KEY, START_TIME_KEY, END_TIME_KEY},
-                    new int[]{R.id.wifi_network_listview, R.id.start_listview, R.id.end_time_listview});
-            itemList.setAdapter(adapter);
-            wifiName.setText("");
-            start.setText("");
-            end.setText("");
+            reloadAdapter();
 
-            locations.openWriteDB();
-            Cursor cursor = locations.getAllItems();
-            cursor.moveToFirst();
-            for (int i = 0; i <cursor.getCount() ; i++) {
-                Log.w("ID", cursor.getLong(0)+"");
-                Log.w("WIFI",cursor.getString(1));
-                Log.w("START", cursor.getInt(2)+"");
-                Log.w("END", cursor.getInt(3)+"");
-                cursor.moveToNext();
-            }
-            cursor.close();
-            locations.closeDB();
 
-            //adapter.notifyDataSetChanged();
         }
+    }
+
+    private void reloadAdapter() {
+
+        Locations locations = new Locations(this);
+
+        Cursor cursor = locations.getAllItems();
+        /*cursor.moveToFirst();
+        for (int i = 0; i <cursor.getCount() ; i++) {
+            Log.w("ID", cursor.getLong(0)+"");
+            Log.w("WIFI",cursor.getString(1));
+            Log.w("START", cursor.getInt(2)+"");
+            Log.w("END", cursor.getInt(3)+"");
+            cursor.moveToNext();
+        }
+        cursor.close();
+        locations.closeDB();*/
+
+
+
+        //adapter.notifyDataSetChanged();
+
+        SimpleCursorAdapter simpleCursorAdapter = new SimpleCursorAdapter(this,R.layout.listitem,cursor,
+                new String[]{Locations.WIFI_NAME_FIELD, Locations.START_TIME_FIELD, Locations.END_TIME_FIELD},
+                new int[]{R.id.wifi_network_listview, R.id.start_listview, R.id.end_time_listview},1);
+
+        itemList.setAdapter(simpleCursorAdapter);
+
+        wifiName.setText("");
+        start.setText("");
+        end.setText("");
     }
 
     public void changeToSilence(View view) {
@@ -204,5 +221,11 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Reverted back to original normal volume", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        locations.closeDB();
     }
 }
