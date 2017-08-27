@@ -93,18 +93,18 @@ public class Locations {
        return db.insert(CONDITIONS_TBL, null, contentValues);
     }
 
-    public int updateConditionById(int itemId, String wifiName, long start_Time, long end_Time){
+    public int updateConditionById(long itemId, String wifiName, long start_Time, long end_Time){
         ContentValues contentValues = new ContentValues();
         contentValues.put(WIFI_NAME_FIELD, wifiName);
         contentValues.put(START_TIME_FIELD, start_Time);
         contentValues.put(END_TIME_FIELD, end_Time);
 
-        return db.update(CONDITIONS_TBL, contentValues, ITEM_ID_FIELD+" = ?", new String[]{Integer.toString(itemId)});
+        return db.update(CONDITIONS_TBL, contentValues, ITEM_ID_FIELD+" = ?", new String[]{Long.toString(itemId)});
 
     }
 
-    public void removeConditionById(int itemId){
-        db.delete(CONDITIONS_TBL, ITEM_ID_FIELD+" = ?", new String[]{Integer.toString(itemId)});
+    public void removeConditionById(long itemId){
+        db.delete(CONDITIONS_TBL, ITEM_ID_FIELD+" = ?", new String[]{Long.toString(itemId)});
 
     }
 

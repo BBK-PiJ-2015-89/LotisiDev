@@ -15,6 +15,7 @@ import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,14 +43,15 @@ public class MainActivity extends AppCompatActivity {
     private EditText end;
     private ArrayAdapter<String> adapter;
     private ListView itemList;
+    private Button add;
     private Locations locations;
+    private long selectedItem = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Locations locations = new Locations(this);
         locations.openWriteDB();
-
         setContentView(R.layout.activity_main);
 
         //testing if we have permission
@@ -73,37 +75,62 @@ public class MainActivity extends AppCompatActivity {
         start = (EditText) findViewById(R.id.start_time);
         end = (EditText) findViewById(R.id.end_time);
         itemList = (ListView) findViewById(R.id.item_List);
-
-        //adapter = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, items);
-        //itemList.setAdapter(adapter);
+        add = (Button) findViewById(R.id.add);
         reloadAdapter();
 
+
+        itemList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                System.out.println(l + " is the retrieved item ID");
+                Cursor cursor = locations.getConditionByID(l);
+                //selectedItem = l;
+               // wifiName.setText(cursor.getColumnName(1));
+            }
+        });
 
         //listviewtestend
     }
 
     public void add(View view) {
         if (!wifiName.getText().toString().equals("")) {
-            //items.add(Array[wifiName.getText().toString()][start.getText().toString()][end.getText().toString()])
 
             //---------inserting into DB----------
 
-            //Locations locations = new Locations(this);
-            //locations.openWriteDB();
-            locations.addCondition(wifiName.getText().toString(), Integer.parseInt(start.getText().toString()), Integer.parseInt(end.getText().toString()));
-            //locations.closeDB();
+            Locations locations = new Locations(this);
+            locations.openWriteDB();
 
-            //--------------------------------------
+            if(selectedItem == -1){
+                locations.addCondition(wifiName.getText().toString(), Integer.parseInt(start.getText().toString()), Integer.parseInt(end.getText().toString()));
 
-            HashMap<String, String> item = new HashMap<>();
+            }
+            else{
+                locations.updateConditionById(selectedItem, wifiName.getText().toString(), Integer.parseInt(start.getText().toString()), Integer.parseInt(end.getText().toString()));
+                selectedItem = -1;
+                add.setText("Add");
+                Toast.makeText(this, "Successfully edited", Toast.LENGTH_SHORT).show();
+            }
+
+
+
+
+
+
+            locations.closeDB();
+
+
+
+
+
+            /*HashMap<String, String> item = new HashMap<>();
             item.put(WIFI_NAME_KEY, wifiName.getText().toString());
             item.put(START_TIME_KEY, start.getText().toString());
             item.put(END_TIME_KEY, end.getText().toString());
 
-            items.add(item);
+            items.add(item);*/
 
-            //items.add(new Condition(wifiName.getText().toString(), (Integer.parseInt(start.getText().toString())), (Integer.parseInt(end.getText().toString()))));
-            //items.add(wifiName.getText().toString());
             reloadAdapter();
 
 
@@ -112,23 +139,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void reloadAdapter() {
 
-        Locations locations = new Locations(this);
 
         Cursor cursor = locations.getAllItems();
-        /*cursor.moveToFirst();
-        for (int i = 0; i <cursor.getCount() ; i++) {
-            Log.w("ID", cursor.getLong(0)+"");
-            Log.w("WIFI",cursor.getString(1));
-            Log.w("START", cursor.getInt(2)+"");
-            Log.w("END", cursor.getInt(3)+"");
-            cursor.moveToNext();
-        }
-        cursor.close();
-        locations.closeDB();*/
-
-
-
-        //adapter.notifyDataSetChanged();
 
         SimpleCursorAdapter simpleCursorAdapter = new SimpleCursorAdapter(this,R.layout.listitem,cursor,
                 new String[]{Locations.WIFI_NAME_FIELD, Locations.START_TIME_FIELD, Locations.END_TIME_FIELD},
@@ -221,11 +233,5 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Reverted back to original normal volume", Toast.LENGTH_SHORT).show();
         }
 
-    }
-
-    @Override
-    protected void onDestroy(){
-        super.onDestroy();
-        locations.closeDB();
     }
 }
