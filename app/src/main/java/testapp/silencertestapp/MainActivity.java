@@ -2,6 +2,7 @@ package testapp.silencertestapp;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.AudioManager;
@@ -9,6 +10,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.renderscript.ScriptIntrinsicYuvToRGB;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.NeighboringCellInfo;
@@ -36,21 +38,18 @@ public class MainActivity extends AppCompatActivity {
     public static final String WIFI_NAME_KEY = "_wifi_name";
     public static final String START_TIME_KEY = "_start_time";
     public static final String END_TIME_KEY = "_end_time";
-    Button silenceBtn;
-    private ArrayList<HashMap<String, String>> items = new ArrayList<>();
     private EditText wifiName;
     private EditText start;
     private EditText end;
     private ArrayAdapter<String> adapter;
     private ListView itemList;
     private Button add;
-    private Locations locations;
     private long selectedItem = -1;
+    private final Locations locations = new Locations(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Locations locations = new Locations(this);
         locations.openWriteDB();
         setContentView(R.layout.activity_main);
 
@@ -79,19 +78,32 @@ public class MainActivity extends AppCompatActivity {
         reloadAdapter();
 
 
-        itemList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        itemList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                System.out.println(l + " is the retrieved item ID");
                 Cursor cursor = locations.getConditionByID(l);
-                //selectedItem = l;
-               // wifiName.setText(cursor.getColumnName(1));
+                cursor.moveToNext();
+                wifiName.setText(cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
+                start.setText(cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD)));
+                end.setText(cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD)));
+                add.setText("Edit");
+                cursor.close();
+                selectedItem = l;
             }
         });
 
-        //listviewtestend
+        itemList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                System.out.println("item long clicked");
+                displayDialog(l);
+                return true;
+            }
+        });
     }
 
     public void add(View view) {
@@ -153,6 +165,34 @@ public class MainActivity extends AppCompatActivity {
         end.setText("");
     }
 
+    private void displayDialog(final long selected){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Alert");
+        builder.setMessage("Do you really want to remove this condition?");
+        builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //delete
+
+                locations.removeConditionById(selected);
+                reloadAdapter();
+                Toast.makeText(MainActivity.this, "Removed Condition", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener(){
+
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        builder.setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     public void changeToSilence(View view) {
         final AudioManager myAudioManager;
         myAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -210,6 +250,12 @@ public class MainActivity extends AppCompatActivity {
         Boolean setToSilent = false;
         Calendar c = Calendar.getInstance();
         int hour = c.get(Calendar.HOUR_OF_DAY);
+
+        Cursor cursor = locations.getAllItems();
+        cursor.moveToFirst();
+
+
+
         for (int i = 0; i < items.size(); i++) {
 
             String wifiNetworkName = items.get(i).get(WIFI_NAME_KEY);
