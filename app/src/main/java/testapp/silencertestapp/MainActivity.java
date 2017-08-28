@@ -256,21 +256,23 @@ public class MainActivity extends AppCompatActivity {
         }
         cursor.close();
 
+            for (int i = 0; i < items.size(); i++) {
 
-        for (int i = 0; i < items.size(); i++) {
+                String wifiNetworkName = items.get(i).get(WIFI_NAME_KEY);
+                int start_Time = Integer.parseInt(items.get(i).get(START_TIME_KEY));
+                int end_Time = Integer.parseInt(items.get(i).get(END_TIME_KEY));
 
-            String wifiNetworkName = items.get(i).get(WIFI_NAME_KEY);
-            int start_Time = Integer.parseInt(items.get(i).get(START_TIME_KEY));
-            int end_Time = Integer.parseInt(items.get(i).get(END_TIME_KEY));
-
-            if ((Objects.equals(wifiNetworkName, name) && (start_Time >= hour || end_Time < hour))){
-
-                Toast.makeText(this, wifiNetworkName + " has met the condition TN: " + hour + " >" + start_Time + " + < " + end_Time, Toast.LENGTH_SHORT).show();
-                setToSilent = true;
-            } else {
-                Toast.makeText(this, name + " does not equal " + wifiNetworkName + " as current time is " + hour + "and we needed " + end_Time +" and " + start_Time, Toast.LENGTH_SHORT).show();
-            }
-        }
+                if (start_Time < end_Time && Objects.equals(wifiNetworkName, wifiName)) {
+                    if (start_Time < hour && hour < end_Time) {
+                        setToSilent = true;
+                    }
+                } else if (hour > start_Time && Objects.equals(wifiNetworkName, wifiName)) {
+                    setToSilent = true;
+                } else if (hour < end_Time && Objects.equals(wifiNetworkName, wifiName)) {
+                    setToSilent = true;
+                } else {
+                    //do nothing
+                }
 
         if (setToSilent) {
             myAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
@@ -281,4 +283,4 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-}
+}}

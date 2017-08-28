@@ -111,7 +111,7 @@ public class AutoSilenceService extends Service {
         wifiName = wifiName.replace("\"", ""); //remove ""
 
         Calendar c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int hour = /*c.get(Calendar.HOUR_OF_DAY)*/8;
 
         System.out.println("running service");
 
@@ -126,10 +126,10 @@ public class AutoSilenceService extends Service {
                 int end_Time = Integer.parseInt(items.get(i).get(END_TIME_KEY));
 
                 if (start_Time < end_Time && Objects.equals(wifiNetworkName, wifiName)) {
-                    if (start_Time < hour && hour < end_Time) {
+                    if (start_Time <= hour && hour <= end_Time) {
                         setToSilent = true;
                     }
-                } else if (hour > start_Time && Objects.equals(wifiNetworkName, wifiName)) {
+                } else if (hour >= start_Time && Objects.equals(wifiNetworkName, wifiName)) {
                     setToSilent = true;
                 } else if (hour < end_Time && Objects.equals(wifiNetworkName, wifiName)) {
                     setToSilent = true;
