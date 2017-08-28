@@ -1,5 +1,6 @@
 package testapp.silencertestapp;
 
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -109,8 +110,6 @@ public class MainActivity extends AppCompatActivity {
     public void add(View view) {
         if (!wifiName.getText().toString().equals("")) {
 
-            //---------inserting into DB----------
-
             Locations locations = new Locations(this);
             locations.openWriteDB();
 
@@ -125,26 +124,14 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Successfully edited", Toast.LENGTH_SHORT).show();
             }
 
-
-
-
-
-
             locations.closeDB();
-
-
-
-
-
-            /*HashMap<String, String> item = new HashMap<>();
-            item.put(WIFI_NAME_KEY, wifiName.getText().toString());
-            item.put(START_TIME_KEY, start.getText().toString());
-            item.put(END_TIME_KEY, end.getText().toString());
-
-            items.add(item);*/
-
             reloadAdapter();
 
+            //restart service due to update in DB --------
+            Intent intent = new Intent(this, AutoSilenceService.class);
+            stopService(intent);
+            startService(intent);
+            //---------------------
 
         }
     }
@@ -169,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Alert");
         builder.setMessage("Do you really want to remove this condition?");
+        Intent intent = new Intent(this, AutoSilenceService.class);
         builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -177,6 +165,8 @@ public class MainActivity extends AppCompatActivity {
                 locations.removeConditionById(selected);
                 reloadAdapter();
                 Toast.makeText(MainActivity.this, "Removed Condition", Toast.LENGTH_SHORT).show();
+                stopService(intent);
+                startService(intent);
             }
         });
 
@@ -191,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setCancelable(false);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+
     }
 
     public void changeToSilence(View view) {
@@ -251,9 +242,19 @@ public class MainActivity extends AppCompatActivity {
         Calendar c = Calendar.getInstance();
         int hour = c.get(Calendar.HOUR_OF_DAY);
 
+        ArrayList<HashMap<String, String>> items = new ArrayList<>();
+
         Cursor cursor = locations.getAllItems();
         cursor.moveToFirst();
-
+        for (int i = 0; i <cursor.getCount() ; i++) {
+            HashMap<String, String> item = new HashMap<>();
+            item.put(WIFI_NAME_KEY, cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
+            item.put(START_TIME_KEY, cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD)));
+            item.put(END_TIME_KEY, cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD)));
+            items.add(item);
+            cursor.moveToNext();
+        }
+        cursor.close();
 
 
         for (int i = 0; i < items.size(); i++) {
@@ -262,12 +263,12 @@ public class MainActivity extends AppCompatActivity {
             int start_Time = Integer.parseInt(items.get(i).get(START_TIME_KEY));
             int end_Time = Integer.parseInt(items.get(i).get(END_TIME_KEY));
 
-            if ((Objects.equals(wifiNetworkName, name) && (start_Time <= hour && end_Time > hour))){
+            if ((Objects.equals(wifiNetworkName, name) && (start_Time >= hour || end_Time < hour))){
 
                 Toast.makeText(this, wifiNetworkName + " has met the condition TN: " + hour + " >" + start_Time + " + < " + end_Time, Toast.LENGTH_SHORT).show();
                 setToSilent = true;
             } else {
-                Toast.makeText(this, name + " does not equal " + wifiNetworkName, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, name + " does not equal " + wifiNetworkName + " as current time is " + hour + "and we needed " + end_Time +" and " + start_Time, Toast.LENGTH_SHORT).show();
             }
         }
 
