@@ -9,6 +9,7 @@ import android.media.AudioManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.support.v4.util.ArraySet;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,7 +24,6 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -102,6 +102,27 @@ public class MainActivity extends AppCompatActivity {
                 wifiName.setText(cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
                 start.setText(cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD)));
                 end.setText(cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD)));
+                String tempdays = cursor.getString(cursor.getColumnIndex(Locations.DAYS_OF_WEEK_FIELD));
+                String[] days = tempdays.split(",");
+                Set<Integer> daySet = new HashSet<>();
+                for (String day : days) {
+                    daySet.add(Integer.parseInt(day));
+                }
+                if(daySet.contains(1)){
+                    sunday.setChecked(true);
+                }if(daySet.contains(2)){
+                    monday.setChecked(true);
+                }if(daySet.contains(3)){
+                    tuesday.setChecked(true);
+                }if(daySet.contains(4)){
+                    wednesday.setChecked(true);
+                }if(daySet.contains(5)){
+                    thursday.setChecked(true);
+                }if(daySet.contains(6)){
+                    friday.setChecked(true);
+                }if(daySet.contains(7)){
+                    saturday.setChecked(true);
+                }
                 add.setText("Edit");
                 cursor.close();
                 selectedItem = l;
@@ -113,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                System.out.println("item long clicked");
                 displayDialog(l);
                 return true;
             }
@@ -121,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void add(View view) {
-        if (!wifiName.getText().toString().equals("")) {
+        if (!wifiName.getText().toString().equals("") && (monday.isChecked() || tuesday.isChecked() || wednesday.isChecked() || thursday.isChecked() || friday.isChecked() || saturday.isChecked() || sunday.isChecked()) && !start.getText().toString().equals("") && !end.getText().toString().equals("")) {
 
             Locations locations = new Locations(this);
             locations.openWriteDB();
@@ -153,20 +173,12 @@ public class MainActivity extends AppCompatActivity {
 
 
             //store days array string result in friendly way
-            String stringDays = days.toString().replace("[", "");
+            String stringDays = days.toString();
+            stringDays = stringDays.replace("[", "");
             stringDays = stringDays.replace("]", "");
             stringDays = stringDays.replace(" ", "");
 
             //------
-
-
-
-            //String[] example = test.split(",");
-           // Set<Integer> exampleIntSet = new HashSet<>();
-            //for (String anExample : example) {
-           //     exampleIntSet.add(Integer.parseInt(anExample));
-           // }
-
 
             if(selectedItem == -1){
                 locations.addCondition(wifiName.getText().toString(), Integer.parseInt(start.getText().toString()), Integer.parseInt(end.getText().toString()), stringDays);
@@ -189,6 +201,14 @@ public class MainActivity extends AppCompatActivity {
             //---------------------
 
         }
+        else{
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Alert");
+            builder.setMessage("All fields are mandatory and you must select at least one day.");
+            builder.setCancelable(true);
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        }
     }
 
     private void reloadAdapter() {
@@ -205,6 +225,13 @@ public class MainActivity extends AppCompatActivity {
         wifiName.setText("");
         start.setText("");
         end.setText("");
+        monday.setChecked(false);
+        tuesday.setChecked(false);
+        wednesday.setChecked(false);
+        thursday.setChecked(false);
+        friday.setChecked(false);
+        saturday.setChecked(false);
+        sunday.setChecked(false);
     }
 
     private void displayDialog(final long selected){
@@ -296,8 +323,13 @@ public class MainActivity extends AppCompatActivity {
         Boolean setToSilent = false;
         Calendar c = Calendar.getInstance();
         int hour = c.get(Calendar.HOUR_OF_DAY);
+        int today = c.get(Calendar.DAY_OF_WEEK);
 
         ArrayList<HashMap<String, String>> items = new ArrayList<>();
+        ArrayList<Set<Integer>> storedDays = new ArrayList<>();
+
+
+
 
         Cursor cursor = locations.getAllItems();
         cursor.moveToFirst();
@@ -306,6 +338,13 @@ public class MainActivity extends AppCompatActivity {
             item.put(WIFI_NAME_KEY, cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
             item.put(START_TIME_KEY, cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD)));
             item.put(END_TIME_KEY, cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD)));
+            String tempdays = cursor.getString(cursor.getColumnIndex(Locations.DAYS_OF_WEEK_FIELD));
+            String[] days = tempdays.split(",");
+            Set<Integer> daySet = new HashSet<>();
+            for (String day : days) {
+                daySet.add(Integer.parseInt(day));
+            }
+            storedDays.add(daySet);
             items.add(item);
             cursor.moveToNext();
         }
@@ -316,14 +355,16 @@ public class MainActivity extends AppCompatActivity {
                 String wifiNetworkName = items.get(i).get(WIFI_NAME_KEY);
                 int start_Time = Integer.parseInt(items.get(i).get(START_TIME_KEY));
                 int end_Time = Integer.parseInt(items.get(i).get(END_TIME_KEY));
+                Set<Integer> daySetRetrieved = storedDays.get(i);
 
-                if (start_Time < end_Time && Objects.equals(wifiNetworkName, wifiName)) {
-                    if (start_Time < hour && hour < end_Time) {
+                if (start_Time < end_Time && Objects.equals(wifiNetworkName, name) && daySetRetrieved.contains(today)) {
+                    if (start_Time <= hour && hour < end_Time) {
                         setToSilent = true;
                     }
-                } else if (hour > start_Time && Objects.equals(wifiNetworkName, wifiName)) {
-                    setToSilent = true;
-                } else if (hour < end_Time && Objects.equals(wifiNetworkName, wifiName)) {
+                } else if (hour >= start_Time && Objects.equals(wifiNetworkName, name)) {
+                    if(daySetRetrieved.contains(today)){
+                    setToSilent = true;}
+                } else if (hour <= end_Time && Objects.equals(wifiNetworkName, name) && daySetRetrieved.contains(today-1)) {
                     setToSilent = true;
                 } else {
                     //do nothing
