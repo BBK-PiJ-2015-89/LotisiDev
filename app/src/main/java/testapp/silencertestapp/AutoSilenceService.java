@@ -16,7 +16,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,6 +41,7 @@ public class AutoSilenceService extends Service {
     private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     private final Locations locations = new Locations(this);
     private final ArrayList<HashMap<String, String>> items = new ArrayList<>();
+    private final ArrayList<Set<Integer>> storedDays = new ArrayList<>();
 
     @Override
     public void onCreate() {
@@ -50,12 +53,20 @@ public class AutoSilenceService extends Service {
         System.out.println("starting service");
         locations.openReadOnlyDB();
         Cursor cursor = locations.getAllItems();
+
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
             HashMap<String, String> item = new HashMap<>();
             item.put(WIFI_NAME_KEY, cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
             item.put(START_TIME_KEY, cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD)));
             item.put(END_TIME_KEY, cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD)));
+            String tempdays = cursor.getString(cursor.getColumnIndex(Locations.DAYS_OF_WEEK_FIELD));
+            String[] days = tempdays.split(",");
+            Set<Integer> daySet = new HashSet<>();
+            for (String day : days) {
+                daySet.add(Integer.parseInt(day));
+            }
+            storedDays.add(daySet);
             items.add(item);
             cursor.moveToNext();
         }
@@ -93,8 +104,6 @@ public class AutoSilenceService extends Service {
     }
 
     private void check() {
-
-        System.out.println("check running");
         final AudioManager myAudioManager;
         myAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         WifiManager wifiMgr = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -112,7 +121,7 @@ public class AutoSilenceService extends Service {
 
         Calendar c = Calendar.getInstance();
         int hour = c.get(Calendar.HOUR_OF_DAY);
-        int day = c.get(Calendar.DAY_OF_WEEK);
+        int today = c.get(Calendar.DAY_OF_WEEK);
 
         System.out.println("running service");
 
@@ -125,14 +134,16 @@ public class AutoSilenceService extends Service {
                 String wifiNetworkName = items.get(i).get(WIFI_NAME_KEY);
                 int start_Time = Integer.parseInt(items.get(i).get(START_TIME_KEY));
                 int end_Time = Integer.parseInt(items.get(i).get(END_TIME_KEY));
+                Set<Integer> daySetRetrieved = storedDays.get(i);
 
-                if (start_Time < end_Time && Objects.equals(wifiNetworkName, wifiName)) {
-                    if (start_Time <= hour && hour <= end_Time) {
+                if (start_Time < end_Time && Objects.equals(wifiNetworkName, wifiName) && daySetRetrieved.contains(today)) {
+                    if (start_Time <= hour && hour < end_Time) {
                         setToSilent = true;
                     }
                 } else if (hour >= start_Time && Objects.equals(wifiNetworkName, wifiName)) {
-                    setToSilent = true;
-                } else if (hour < end_Time && Objects.equals(wifiNetworkName, wifiName)) {
+                    if(daySetRetrieved.contains(today)){
+                        setToSilent = true;}
+                } else if (hour <= end_Time && Objects.equals(wifiNetworkName, wifiName) && daySetRetrieved.contains(today-1)) {
                     setToSilent = true;
                 } else {
                     //do nothing
