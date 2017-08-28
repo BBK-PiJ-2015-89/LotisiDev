@@ -9,7 +9,6 @@ import android.media.AudioManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.support.v4.util.ArraySet;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -96,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+                untickCheckBoxes();
                 Cursor cursor = locations.getConditionByID(l);
                 cursor.moveToNext();
                 wifiName.setText(cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
@@ -225,6 +224,10 @@ public class MainActivity extends AppCompatActivity {
         wifiName.setText("");
         start.setText("");
         end.setText("");
+        untickCheckBoxes();
+    }
+
+    private void untickCheckBoxes() {
         monday.setChecked(false);
         tuesday.setChecked(false);
         wednesday.setChecked(false);
