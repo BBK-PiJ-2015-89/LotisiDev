@@ -1,6 +1,5 @@
 package testapp.silencertestapp;
 
-import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,30 +9,26 @@ import android.media.AudioManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.renderscript.ScriptIntrinsicYuvToRGB;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.NeighboringCellInfo;
-import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
     public static final String WIFI_NAME_KEY = "_wifi_name";
@@ -42,9 +37,16 @@ public class MainActivity extends AppCompatActivity {
     private EditText wifiName;
     private EditText start;
     private EditText end;
-    private ArrayAdapter<String> adapter;
     private ListView itemList;
     private Button add;
+    private CheckBox monday;
+    private CheckBox tuesday;
+    private CheckBox wednesday;
+    private CheckBox thursday;
+    private CheckBox friday;
+    private CheckBox saturday;
+    private CheckBox sunday;
+
     private long selectedItem = -1;
     private final Locations locations = new Locations(this);
 
@@ -76,6 +78,17 @@ public class MainActivity extends AppCompatActivity {
         end = (EditText) findViewById(R.id.end_time);
         itemList = (ListView) findViewById(R.id.item_List);
         add = (Button) findViewById(R.id.add);
+        monday = (CheckBox) findViewById(R.id.monCheckbox);
+        tuesday = (CheckBox) findViewById(R.id.tuCheckbox);
+        wednesday = (CheckBox) findViewById(R.id.wedCheckBox);
+        thursday = (CheckBox) findViewById(R.id.thuCheckbox);
+        friday = (CheckBox) findViewById(R.id.friCheckbox);
+        saturday = (CheckBox) findViewById(R.id.satCheckbox);
+        sunday = (CheckBox) findViewById(R.id.sunCheckbox);
+
+
+
+
         reloadAdapter();
 
 
@@ -112,13 +125,55 @@ public class MainActivity extends AppCompatActivity {
 
             Locations locations = new Locations(this);
             locations.openWriteDB();
+            Set<Integer> days = new HashSet<>();
+
+            //checking which days are selected before edit/write -------
+            if(monday.isChecked()){
+                days.add(2);
+            }
+            if (tuesday.isChecked()){
+                days.add(3);
+            }
+            if(wednesday.isChecked()){
+                days.add(4);
+            }
+            if(thursday.isChecked()){
+                days.add(5);
+            }
+            if(friday.isChecked()){
+                days.add(6);
+            }
+            if(saturday.isChecked()){
+                days.add(7);
+            }
+            if(sunday.isChecked()){
+                days.add(1);
+            }
+            //-----------------------------------------------------------
+
+
+            //store days array string result in friendly way
+            String stringDays = days.toString().replace("[", "");
+            stringDays = stringDays.replace("]", "");
+            stringDays = stringDays.replace(" ", "");
+
+            //------
+
+
+
+            //String[] example = test.split(",");
+           // Set<Integer> exampleIntSet = new HashSet<>();
+            //for (String anExample : example) {
+           //     exampleIntSet.add(Integer.parseInt(anExample));
+           // }
+
 
             if(selectedItem == -1){
-                locations.addCondition(wifiName.getText().toString(), Integer.parseInt(start.getText().toString()), Integer.parseInt(end.getText().toString()));
+                locations.addCondition(wifiName.getText().toString(), Integer.parseInt(start.getText().toString()), Integer.parseInt(end.getText().toString()), stringDays);
 
             }
             else{
-                locations.updateConditionById(selectedItem, wifiName.getText().toString(), Integer.parseInt(start.getText().toString()), Integer.parseInt(end.getText().toString()));
+                locations.updateConditionById(selectedItem, wifiName.getText().toString(), Integer.parseInt(start.getText().toString()), Integer.parseInt(end.getText().toString()), stringDays);
                 selectedItem = -1;
                 add.setText("Add");
                 Toast.makeText(this, "Successfully edited", Toast.LENGTH_SHORT).show();

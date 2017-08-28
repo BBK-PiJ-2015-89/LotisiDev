@@ -107,7 +107,8 @@
 
         app:layout_constraintTop_toBottomOf="@+id/wifinetwork"
 
-        app:layout_constraintHorizontal_bias="0.0" />
+        app:layout_constraintHorizontal_bias="0.0"
+        tools:layout_editor_absoluteX="0dp" />
 
     <TextView
         android:id="@+id/textView"
@@ -118,21 +119,26 @@
         app:layout_constraintTop_toBottomOf="@+id/wifinetwork"
         android:windowSoftInputMode="adjustPan"
         android:layout_marginLeft="16dp"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="16dp" />
 
     <android.support.constraint.Guideline
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/guideline"
         app:layout_constraintGuide_begin="20dp"
-        android:orientation="vertical" />
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="20dp" />
 
     <android.support.constraint.Guideline
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/guideline2"
         app:layout_constraintGuide_begin="20dp"
-        android:orientation="horizontal" />
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteY="20dp"
+        tools:layout_editor_absoluteX="0dp" />
 
     <TextView
         android:id="@+id/textView2"
@@ -142,7 +148,8 @@
         android:layout_marginTop="42dp"
         app:layout_constraintTop_toBottomOf="@+id/end_time"
         app:layout_constraintLeft_toRightOf="@+id/textView"
-        android:layout_marginLeft="87dp" />
+        android:layout_marginLeft="87dp"
+        android:layout_marginStart="87dp" />
 
     <TextView
         android:id="@+id/textView3"
@@ -152,14 +159,87 @@
         android:layout_marginTop="30dp"
         app:layout_constraintTop_toBottomOf="@+id/add"
         android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginEnd="8dp" />
 
     <android.support.constraint.Guideline
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/guideline3"
         app:layout_constraintGuide_begin="20dp"
-        android:orientation="vertical" />
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="20dp" />
+
+    <CheckBox
+        android:id="@+id/sunCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SU"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="241dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="223dp" />
+
+    <CheckBox
+        android:id="@+id/satCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="S"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="202dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="223dp" />
+
+    <CheckBox
+        android:id="@+id/friCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="F"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="162dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="223dp" />
+
+    <CheckBox
+        android:id="@+id/thuCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="T"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="121dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="223dp" />
+
+    <CheckBox
+        android:id="@+id/wedCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="W"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="80dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="223dp" />
+
+    <CheckBox
+        android:id="@+id/tuCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="T"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="42dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="223dp"/>
+
+    <CheckBox
+        android:id="@+id/monCheckbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="M"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="223dp" />
 
 
 </android.support.constraint.ConstraintLayout>

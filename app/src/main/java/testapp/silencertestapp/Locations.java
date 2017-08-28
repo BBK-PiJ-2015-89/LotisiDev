@@ -22,12 +22,13 @@ public class Locations {
     public static final String START_TIME_FIELD = "_start_time";
     public static final String END_TIME_FIELD = "_end_time";
     public static final String ITEM_ID_FIELD = "_id";
+    public static final String DAYS_OF_WEEK_FIELD = "_days_of_week";
     public static final int DB_VER = 1;
-    public static final String[] ALL_FIELDS = {ITEM_ID_FIELD, WIFI_NAME_FIELD, START_TIME_FIELD, END_TIME_FIELD};
+    public static final String[] ALL_FIELDS = {ITEM_ID_FIELD, WIFI_NAME_FIELD, START_TIME_FIELD, END_TIME_FIELD, DAYS_OF_WEEK_FIELD};
 
     public static final String CREATE_TBL = "CREATE table "+CONDITIONS_TBL+
             " ("+ITEM_ID_FIELD+" INTEGER PRIMARY KEY AUTOINCREMENT, "+ WIFI_NAME_FIELD+" TEXT NOT NULL, "+
-            START_TIME_FIELD+" INTEGER NOT NULL, " +END_TIME_FIELD+" INTEGER NOT NULL)";
+            START_TIME_FIELD+" INTEGER NOT NULL, " +END_TIME_FIELD+" INTEGER NOT NULL, " + DAYS_OF_WEEK_FIELD+ " TEXT NOT NULL)";
 
     public class ConditionDBOpenHelper extends SQLiteOpenHelper{
 
@@ -84,20 +85,22 @@ public class Locations {
                 return cursor;
     }
 
-    public long addCondition(String wifiName, long start_Time, long end_time ){
+    public long addCondition(String wifiName, long start_Time, long end_time, String days_of_week){
         ContentValues contentValues = new ContentValues();
         contentValues.put(WIFI_NAME_FIELD, wifiName);
         contentValues.put(START_TIME_FIELD, start_Time);
         contentValues.put(END_TIME_FIELD, end_time);
+        contentValues.put(DAYS_OF_WEEK_FIELD, days_of_week);
 
        return db.insert(CONDITIONS_TBL, null, contentValues);
     }
 
-    public int updateConditionById(long itemId, String wifiName, int start_Time, int end_Time){
+    public int updateConditionById(long itemId, String wifiName, int start_Time, int end_Time, String days_of_week){
         ContentValues contentValues = new ContentValues();
         contentValues.put(WIFI_NAME_FIELD, wifiName);
         contentValues.put(START_TIME_FIELD, start_Time);
         contentValues.put(END_TIME_FIELD, end_Time);
+        contentValues.put(DAYS_OF_WEEK_FIELD, days_of_week);
 
         return db.update(CONDITIONS_TBL, contentValues, ITEM_ID_FIELD+" = ?", new String[]{Long.toString(itemId)});
 
