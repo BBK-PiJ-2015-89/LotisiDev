@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
-        //listviewtest
 
         wifiName = (EditText) findViewById(R.id.wifinetwork);
         start = (TimePicker) findViewById(R.id.startPicker);
@@ -111,10 +110,6 @@ public class MainActivity extends AppCompatActivity {
                 int endTimeIntHour = getHour(endHourCombined);
                 int endTimeIntMinute = getMinute(endHourCombined);
 
-                System.out.println(startTimeIntHour + " hour");
-                System.out.println(startTimeIntMinute + " minute");
-                System.out.println(endTimeIntHour + " end hour");
-                System.out.println(endTimeIntMinute + " end minute");
 
                 wifiName.setText(cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
                 start.setHour(startTimeIntHour);
@@ -161,17 +156,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private int getHour(String HourCombined) {
+    private int getHour(String hourCombined) {
+        hourCombined = Integer.toString(dismantleFancyTime(hourCombined));
         int intHour;
-        if((HourCombined.length()==4)){
-            intHour = Integer.parseInt(HourCombined.substring(0, 2));
+        if((hourCombined.length()==4)){
+            intHour = Integer.parseInt(hourCombined.substring(0, 2));
 
         }
-        else if (HourCombined.length()==3){
-            intHour = Integer.parseInt(HourCombined.substring(0, 1));
+        else if (hourCombined.length()==3){
+            intHour = Integer.parseInt(hourCombined.substring(0, 1));
 
         }
-        else if (HourCombined.length()==2){
+        else if (hourCombined.length()==2){
             intHour = 0;
 
         }
@@ -183,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int getMinute(String minuteCombined) {
+        minuteCombined = Integer.toString(dismantleFancyTime(minuteCombined));
         int IntMinute;
         if(minuteCombined.length()==4){
             System.out.println(minuteCombined  + " this is the end minute combined");
@@ -251,12 +248,15 @@ public class MainActivity extends AppCompatActivity {
             int endHour = end.getHour();
             int endMinute = end.getMinute();
             int combinedEndTime = (endHour * 100) + endMinute;
+            String combinedFancyEndTime = createFancyTime(combinedEndTime);
+            String combinedFancyStartTime = createFancyTime(combinedStartTime);
+
 
             if(selectedItem == -1){
-                locations.addCondition(wifiName.getText().toString(), combinedStartTime, combinedEndTime, stringDays);
+                locations.addCondition(wifiName.getText().toString(), combinedFancyStartTime, combinedFancyEndTime, stringDays);
             }
             else{
-                locations.updateConditionById(selectedItem, wifiName.getText().toString(), combinedStartTime, combinedEndTime, stringDays);
+                locations.updateConditionById(selectedItem, wifiName.getText().toString(), combinedFancyStartTime, combinedFancyEndTime, stringDays);
                 selectedItem = -1;
                 add.setText("Add");
                 Toast.makeText(this, "Successfully edited", Toast.LENGTH_SHORT).show();
@@ -280,6 +280,30 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
         }
+    }
+
+
+    private int dismantleFancyTime(String combinedTime){
+        return Integer.parseInt(combinedTime.replace(";", ""));
+    }
+
+    private String createFancyTime(int combinedTime) {
+
+        StringBuilder tempString = new StringBuilder(Integer.toString(combinedTime));
+        if(tempString.length()==4){
+            tempString = tempString.insert(2, ":");
+        }
+        else if (tempString.length()==3){
+            tempString = tempString.insert(1, ":");
+            tempString = tempString.insert(0, "0");
+        }
+        else if(tempString.length()==2){
+            tempString = tempString.insert(0, "00:");
+        }
+        else if(tempString.length()==1){
+            tempString = tempString.insert(0, "00:0");
+        }
+        return tempString.toString();
     }
 
     private void reloadAdapter() {

@@ -85,7 +85,7 @@ public class Locations {
                 return cursor;
     }
 
-    public long addCondition(String wifiName, long start_Time, long end_time, String days_of_week){
+    public long addCondition(String wifiName,  String start_Time, String end_time, String days_of_week){
         ContentValues contentValues = new ContentValues();
         contentValues.put(WIFI_NAME_FIELD, wifiName);
         contentValues.put(START_TIME_FIELD, start_Time);
@@ -95,7 +95,7 @@ public class Locations {
        return db.insert(CONDITIONS_TBL, null, contentValues);
     }
 
-    public int updateConditionById(long itemId, String wifiName, int start_Time, int end_Time, String days_of_week){
+    public int updateConditionById(long itemId, String wifiName, String start_Time, String end_Time, String days_of_week){
         ContentValues contentValues = new ContentValues();
         contentValues.put(WIFI_NAME_FIELD, wifiName);
         contentValues.put(START_TIME_FIELD, start_Time);
