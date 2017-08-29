@@ -120,7 +120,9 @@ public class AutoSilenceService extends Service {
         wifiName = wifiName.replace("\"", ""); //remove ""
 
         Calendar c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int hournow = c.get(Calendar.HOUR_OF_DAY);
+        int minutenow = c.get(Calendar.MINUTE);
+        int hour = (hournow * 100) + minutenow;
         int today = c.get(Calendar.DAY_OF_WEEK);
 
         System.out.println("running service");

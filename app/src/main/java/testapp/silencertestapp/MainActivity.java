@@ -9,6 +9,7 @@ import android.media.AudioManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.support.annotation.IntegerRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -34,8 +36,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String START_TIME_KEY = "_start_time";
     public static final String END_TIME_KEY = "_end_time";
     private EditText wifiName;
-    private EditText start;
-    private EditText end;
+    private TimePicker start;
+    private TimePicker end;
     private ListView itemList;
     private Button add;
     private CheckBox monday;
@@ -73,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
         //listviewtest
 
         wifiName = (EditText) findViewById(R.id.wifinetwork);
-        start = (EditText) findViewById(R.id.start_time);
-        end = (EditText) findViewById(R.id.end_time);
+        start = (TimePicker) findViewById(R.id.startPicker);
+        end = (TimePicker) findViewById(R.id.endPicker);
         itemList = (ListView) findViewById(R.id.item_List);
         add = (Button) findViewById(R.id.add);
         monday = (CheckBox) findViewById(R.id.monCheckbox);
@@ -85,8 +87,8 @@ public class MainActivity extends AppCompatActivity {
         saturday = (CheckBox) findViewById(R.id.satCheckbox);
         sunday = (CheckBox) findViewById(R.id.sunCheckbox);
 
-
-
+        start.setIs24HourView(true);
+        end.setIs24HourView(true);
 
         reloadAdapter();
 
@@ -98,9 +100,29 @@ public class MainActivity extends AppCompatActivity {
                 untickCheckBoxes();
                 Cursor cursor = locations.getConditionByID(l);
                 cursor.moveToNext();
+
+                String startHourCombined = cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD));
+                String endHourCombined = cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD));
+                System.out.println(startHourCombined);
+                System.out.println(endHourCombined);
+
+                int startTimeIntHour = getHour(startHourCombined);
+                int startTimeIntMinute = getMinute(startHourCombined);
+                int endTimeIntHour = getHour(endHourCombined);
+                int endTimeIntMinute = getMinute(endHourCombined);
+
+                System.out.println(startTimeIntHour + " hour");
+                System.out.println(startTimeIntMinute + " minute");
+                System.out.println(endTimeIntHour + " end hour");
+                System.out.println(endTimeIntMinute + " end minute");
+
                 wifiName.setText(cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
-                start.setText(cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD)));
-                end.setText(cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD)));
+                start.setHour(startTimeIntHour);
+                start.setMinute(startTimeIntMinute);
+                end.setHour(endTimeIntHour);
+                end.setMinute(endTimeIntMinute);
+                //start.setText(cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD)));
+                //end.setText(cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD)));
                 String tempdays = cursor.getString(cursor.getColumnIndex(Locations.DAYS_OF_WEEK_FIELD));
                 String[] days = tempdays.split(",");
                 Set<Integer> daySet = new HashSet<>();
@@ -139,8 +161,50 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private int getHour(String HourCombined) {
+        int intHour;
+        if((HourCombined.length()==4)){
+            intHour = Integer.parseInt(HourCombined.substring(0, 2));
+
+        }
+        else if (HourCombined.length()==3){
+            intHour = Integer.parseInt(HourCombined.substring(0, 1));
+
+        }
+        else if (HourCombined.length()==2){
+            intHour = 0;
+
+        }
+        else{
+            intHour = 0;
+
+        }
+        return intHour;
+    }
+
+    private int getMinute(String minuteCombined) {
+        int IntMinute;
+        if(minuteCombined.length()==4){
+            System.out.println(minuteCombined  + " this is the end minute combined");
+            IntMinute = Integer.parseInt(minuteCombined.substring(2,4));
+        }
+        else if (minuteCombined.length()==3){
+
+            IntMinute = Integer.parseInt(minuteCombined.substring(1,3));
+        }
+        else if (minuteCombined.length()==2){
+
+            IntMinute = Integer.parseInt(minuteCombined.substring(0,2));
+        }
+        else{
+
+            IntMinute = Integer.parseInt(minuteCombined);
+        }
+        return IntMinute;
+    }
+
     public void add(View view) {
-        if (!wifiName.getText().toString().equals("") && (monday.isChecked() || tuesday.isChecked() || wednesday.isChecked() || thursday.isChecked() || friday.isChecked() || saturday.isChecked() || sunday.isChecked()) && !start.getText().toString().equals("") && !end.getText().toString().equals("")) {
+        if (!wifiName.getText().toString().equals("") && (monday.isChecked() || tuesday.isChecked() || wednesday.isChecked() || thursday.isChecked() || friday.isChecked() || saturday.isChecked() || sunday.isChecked()) && ((start.getHour()*100 + start.getMinute() != (end.getHour()*100 + end.getMinute())))) {
 
             Locations locations = new Locations(this);
             locations.openWriteDB();
@@ -179,12 +243,20 @@ public class MainActivity extends AppCompatActivity {
 
             //------
 
-            if(selectedItem == -1){
-                locations.addCondition(wifiName.getText().toString(), Integer.parseInt(start.getText().toString()), Integer.parseInt(end.getText().toString()), stringDays);
 
+            int startHour = start.getHour();
+            int startMinute = start.getMinute();
+            int combinedStartTime = (startHour *100) + startMinute;
+
+            int endHour = end.getHour();
+            int endMinute = end.getMinute();
+            int combinedEndTime = (endHour * 100) + endMinute;
+
+            if(selectedItem == -1){
+                locations.addCondition(wifiName.getText().toString(), combinedStartTime, combinedEndTime, stringDays);
             }
             else{
-                locations.updateConditionById(selectedItem, wifiName.getText().toString(), Integer.parseInt(start.getText().toString()), Integer.parseInt(end.getText().toString()), stringDays);
+                locations.updateConditionById(selectedItem, wifiName.getText().toString(), combinedStartTime, combinedEndTime, stringDays);
                 selectedItem = -1;
                 add.setText("Add");
                 Toast.makeText(this, "Successfully edited", Toast.LENGTH_SHORT).show();
@@ -203,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
         else{
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Alert");
-            builder.setMessage("All fields are mandatory and you must select at least one day.");
+            builder.setMessage("Ensure you have entered a Wifi Network and applied the rule to at least 1 day. You must also ensure your start and end time are not identical.");
             builder.setCancelable(true);
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
@@ -222,8 +294,10 @@ public class MainActivity extends AppCompatActivity {
         itemList.setAdapter(simpleCursorAdapter);
 
         wifiName.setText("");
-        start.setText("");
-        end.setText("");
+        start.setHour(0);
+        start.setMinute(0);
+        end.setHour(0);
+        end.setMinute(0);
         untickCheckBoxes();
     }
 

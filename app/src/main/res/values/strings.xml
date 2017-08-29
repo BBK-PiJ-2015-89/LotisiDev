@@ -3,4 +3,7 @@
     <string name="stop_service">Stop Service</string>
     <string name="start_service">Start Service</string>
     <string name="celltower">celltower</string>
+    <string name="wifi_name_here">WiFi Name Here</string>
+    <string name="start">Start</string>
+    <string name="end">End</string>
 </resources>
