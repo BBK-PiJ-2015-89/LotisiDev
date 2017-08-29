@@ -143,7 +143,7 @@ public class AutoSilenceService extends Service {
                 } else if (hour >= start_Time && Objects.equals(wifiNetworkName, wifiName)) {
                     if(daySetRetrieved.contains(today)){
                         setToSilent = true;}
-                } else if (hour <= end_Time && Objects.equals(wifiNetworkName, wifiName) && daySetRetrieved.contains(today-1)) {
+                } else if (hour < end_Time && Objects.equals(wifiNetworkName, wifiName) && daySetRetrieved.contains(today-1)) {
                     setToSilent = true;
                 } else {
                     //do nothing

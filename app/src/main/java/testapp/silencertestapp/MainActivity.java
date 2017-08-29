@@ -367,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if (hour >= start_Time && Objects.equals(wifiNetworkName, name)) {
                     if(daySetRetrieved.contains(today)){
                     setToSilent = true;}
-                } else if (hour <= end_Time && Objects.equals(wifiNetworkName, name) && daySetRetrieved.contains(today-1)) {
+                } else if (hour < end_Time && Objects.equals(wifiNetworkName, name) && daySetRetrieved.contains(today-1)) {
                     setToSilent = true;
                 } else {
                     //do nothing
