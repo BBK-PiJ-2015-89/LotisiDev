@@ -65,7 +65,6 @@ public class AutoSilenceService extends Service {
         if(NOTIFICATION_TRACKER){
             mNotificationManager.cancel(NOTIFICATION);
         }
-        System.out.println("starting service");
         locations.openReadOnlyDB();
         Cursor cursor = locations.getAllItems();
         final AudioManager myAudioManager;
@@ -118,7 +117,7 @@ public class AutoSilenceService extends Service {
     }
 
     private void looper() {
-        executorService.scheduleAtFixedRate(() -> check(), 0, 1, TimeUnit.MINUTES);
+        executorService.scheduleAtFixedRate(this::check, 0, 1, TimeUnit.MINUTES);
     }
 
     private void check() {
@@ -187,12 +186,11 @@ public class AutoSilenceService extends Service {
     private void notificationExample(){
         Intent intent = new Intent(this, AutoSilenceService.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        System.out.println("Notification Method");
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_stat_name)
                         .setContentTitle("Lotisi")
-                        .setContentText("Stopped due to manual change - click to restart")
+                        .setContentText("Stopped due to manual change - open app and click restart")
                         .setContentIntent(pendingIntent);
 
                 PendingIntent.getActivity(this, 0, new Intent(this, AutoSilenceService.class), 0);

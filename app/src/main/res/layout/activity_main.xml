@@ -6,18 +6,6 @@
     android:layout_height="match_parent"
     tools:context="testapp.silencertestapp.MainActivity">
 
-    <EditText
-        android:id="@+id/wifinetwork"
-        android:layout_width="250dp"
-        android:layout_height="49dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:ems="10"
-        android:hint="WiFi Network"
-        android:inputType="textPersonName"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
 
     <Button
         android:id="@+id/add"
@@ -27,7 +15,7 @@
         android:onClick="add"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="207dp"
-        android:layout_marginRight="5dp"
+        android:layout_marginRight="69dp"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginEnd="5dp" />
 
@@ -36,18 +24,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="WiFi Network Name"
-        android:layout_marginTop="210dp"
-        app:layout_constraintTop_toBottomOf="@+id/wifinetwork"
         android:windowSoftInputMode="adjustPan"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="-44dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginStart="16dp" />
+        android:layout_marginStart="16dp"
+        tools:layout_constraintTop_creator="1"
+        android:layout_marginTop="11dp"
+        app:layout_constraintTop_toBottomOf="@+id/monCheckbox" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="17dp"
-        android:layout_marginRight="30dp"
+        android:layout_marginRight="93dp"
         android:text="Start/End Time"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -58,10 +47,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/guideline3"
-        app:layout_constraintGuide_begin="20dp"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteY="0dp"
-        tools:layout_editor_absoluteX="20dp" />
+        app:layout_constraintGuide_begin="-39dp"
+        android:orientation="vertical" />
 
     <CheckBox
         android:id="@+id/sunCheckbox"
@@ -69,7 +56,7 @@
         android:layout_height="wrap_content"
         android:text="SU"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="241dp"
+        android:layout_marginLeft="184dp"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="216dp"
         android:layout_marginStart="241dp" />
@@ -81,7 +68,7 @@
         android:layout_height="wrap_content"
         android:text="S"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="202dp"
+        android:layout_marginLeft="140dp"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="216dp"
         android:layout_marginStart="202dp" />
@@ -92,7 +79,7 @@
         android:layout_height="wrap_content"
         android:text="F"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="162dp"
+        android:layout_marginLeft="100dp"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="216dp"
         android:layout_marginStart="162dp" />
@@ -141,14 +128,21 @@
 
     <TimePicker
         android:id="@+id/startPicker"
-        android:layout_width="200dp"
+        android:layout_width="0dp"
         android:layout_height="100dp"
 
         android:timePickerMode="spinner"
         app:layout_constraintHorizontal_bias="0.484"
         app:layout_constraintLeft_toLeftOf="@+id/endPicker"
         app:layout_constraintRight_toRightOf="@+id/endPicker"
-        app:layout_constraintTop_toBottomOf="@+id/wifinetwork" />
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toBottomOf="@+id/textView5"
+        android:layout_marginTop="41dp"
+        tools:layout_constraintLeft_creator="1"
+        android:layout_marginBottom="39dp"
+        app:layout_constraintTop_toTopOf="@+id/resetbutton" />
 
 
     <TimePicker
@@ -158,7 +152,7 @@
 
         android:layout_marginTop="123dp"
         android:timePickerMode="spinner"
-        app:layout_constraintHorizontal_bias="0.256"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -191,15 +185,17 @@
     <ListView
         android:id="@+id/item_List"
         android:layout_width="0dp"
-        android:layout_height="235dp"
-        android:layout_marginTop="227dp"
+        android:layout_height="0dp"
 
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wifinetwork"
         tools:layout_constraintRight_creator="1"
-        tools:layout_constraintLeft_creator="1" />
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <Button
         android:id="@+id/resetbutton"
@@ -221,7 +217,7 @@
         android:layout_marginLeft="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="-8dp" />
+        android:layout_marginTop="16dp" />
 
 </android.support.constraint.ConstraintLayout>
 

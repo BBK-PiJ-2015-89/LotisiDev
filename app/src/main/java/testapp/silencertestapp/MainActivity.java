@@ -27,10 +27,11 @@ import android.widget.Toast;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
-    private EditText wifiName;
+    //private EditText wifiName;
     private TimePicker start;
     private TimePicker end;
     private ListView itemList;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox saturday;
     private CheckBox sunday;
     private Spinner spinner;
-    private WifiManager wifiManager;
+    private String DEFAULT_WIFI_TEXT = "Select WiFi Network";
 
 
     private long selectedItem = -1;
@@ -70,14 +71,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
-
-
-        /*ArrayAdapter<WifiConfiguration> adapter = ArrayAdapter.createFromResource(this,
-                wifiConfig.getConfiguredNetworks, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);*/
         spinner = (Spinner) findViewById(R.id.wiFiSpinner);
-        wifiName = (EditText) findViewById(R.id.wifinetwork);
+        //wifiName = (EditText) findViewById(R.id.wifinetwork);
         start = (TimePicker) findViewById(R.id.startPicker);
         end = (TimePicker) findViewById(R.id.endPicker);
         itemList = (ListView) findViewById(R.id.item_List);
@@ -93,65 +88,60 @@ public class MainActivity extends AppCompatActivity {
         start.setIs24HourView(true);
         end.setIs24HourView(true);
 
-        String[] ssidArray = getSSIDs();
+        setSpinner(getSSID(DEFAULT_WIFI_TEXT));
 
-        spinner.setAdapter(new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, ssidArray));
 
         reloadAdapter();
 
 
-        itemList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        itemList.setOnItemClickListener((adapterView, view, i, l) -> {
+            untickCheckBoxes();
+            Cursor cursor = locations.getConditionByID(l);
+            cursor.moveToNext();
 
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                untickCheckBoxes();
-                Cursor cursor = locations.getConditionByID(l);
-                cursor.moveToNext();
+            String startHourCombined = cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD));
+            String endHourCombined = cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD));
+            System.out.println(startHourCombined);
+            System.out.println(endHourCombined);
 
-                String startHourCombined = cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD));
-                String endHourCombined = cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD));
-                System.out.println(startHourCombined);
-                System.out.println(endHourCombined);
+            int startTimeIntHour = getHour(startHourCombined);
+            int startTimeIntMinute = getMinute(startHourCombined);
+            int endTimeIntHour = getHour(endHourCombined);
+            int endTimeIntMinute = getMinute(endHourCombined);
 
-                int startTimeIntHour = getHour(startHourCombined);
-                int startTimeIntMinute = getMinute(startHourCombined);
-                int endTimeIntHour = getHour(endHourCombined);
-                int endTimeIntMinute = getMinute(endHourCombined);
-
-
-                wifiName.setText(cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
-                start.setHour(startTimeIntHour);
-                start.setMinute(startTimeIntMinute);
-                end.setHour(endTimeIntHour);
-                end.setMinute(endTimeIntMinute);
-                //start.setText(cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD)));
-                //end.setText(cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD)));
-                String tempdays = cursor.getString(cursor.getColumnIndex(Locations.DAYS_OF_WEEK_FIELD));
-                String[] days = tempdays.split(",");
-                Set<Integer> daySet = new HashSet<>();
-                for (String day : days) {
-                    daySet.add(Integer.parseInt(day));
-                }
-                if(daySet.contains(1)){
-                    sunday.setChecked(true);
-                }if(daySet.contains(2)){
-                    monday.setChecked(true);
-                }if(daySet.contains(3)){
-                    tuesday.setChecked(true);
-                }if(daySet.contains(4)){
-                    wednesday.setChecked(true);
-                }if(daySet.contains(5)){
-                    thursday.setChecked(true);
-                }if(daySet.contains(6)){
-                    friday.setChecked(true);
-                }if(daySet.contains(7)){
-                    saturday.setChecked(true);
-                }
-                add.setText("Edit");
-                cursor.close();
-                selectedItem = l;
+            String[] wifiNames = getSSID(cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
+            setSpinner(wifiNames);
+            //wifiName.setText(cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
+            start.setHour(startTimeIntHour);
+            start.setMinute(startTimeIntMinute);
+            end.setHour(endTimeIntHour);
+            end.setMinute(endTimeIntMinute);
+            //start.setText(cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD)));
+            //end.setText(cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD)));
+            String tempdays = cursor.getString(cursor.getColumnIndex(Locations.DAYS_OF_WEEK_FIELD));
+            String[] days = tempdays.split(",");
+            Set<Integer> daySet = new HashSet<>();
+            for (String day : days) {
+                daySet.add(Integer.parseInt(day));
             }
+            if(daySet.contains(1)){
+                sunday.setChecked(true);
+            }if(daySet.contains(2)){
+                monday.setChecked(true);
+            }if(daySet.contains(3)){
+                tuesday.setChecked(true);
+            }if(daySet.contains(4)){
+                wednesday.setChecked(true);
+            }if(daySet.contains(5)){
+                thursday.setChecked(true);
+            }if(daySet.contains(6)){
+                friday.setChecked(true);
+            }if(daySet.contains(7)){
+                saturday.setChecked(true);
+            }
+            add.setText("Edit");
+            cursor.close();
+            selectedItem = l;
         });
 
         itemList.setOnItemLongClickListener((adapterView, view, i, l) -> {
@@ -160,9 +150,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void setSpinner(String[] ssidArray) {
+        spinner.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, ssidArray));
+    }
+
     @NonNull
-    private String[] getSSIDs() {
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+    private String[] getSSID(String extra) {
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         List<WifiConfiguration> configuredNetworks =  wifiManager.getConfiguredNetworks();
         String[] ssidArray = new String[configuredNetworks.size()];
         for (int i = 0; i <configuredNetworks.size() ; i++) {
@@ -171,7 +166,10 @@ public class MainActivity extends AppCompatActivity {
             ssidArray[i] = temp;
         }
         Arrays.sort(ssidArray);
-        return ssidArray;
+        String[] copiedArray = new String[ssidArray.length+1];
+        System.arraycopy(ssidArray, 0, copiedArray, 1, copiedArray.length - 1);
+        copiedArray[0] = extra;
+        return copiedArray;
     }
 
     private int getHour(String hourCombined) {
@@ -219,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void add(View view) {
-        if (!wifiName.getText().toString().equals("") && (monday.isChecked() || tuesday.isChecked() || wednesday.isChecked() || thursday.isChecked() || friday.isChecked() || saturday.isChecked() || sunday.isChecked()) && ((start.getHour()*100 + start.getMinute() != (end.getHour()*100 + end.getMinute())))) {
+        if (!Objects.equals(spinner.getSelectedItem().toString(), DEFAULT_WIFI_TEXT) && (monday.isChecked() || tuesday.isChecked() || wednesday.isChecked() || thursday.isChecked() || friday.isChecked() || saturday.isChecked() || sunday.isChecked()) && ((start.getHour()*100 + start.getMinute() != (end.getHour()*100 + end.getMinute())))) {
 
             Locations locations = new Locations(this);
             locations.openWriteDB();
@@ -271,10 +269,10 @@ public class MainActivity extends AppCompatActivity {
 
 
             if(selectedItem == -1){
-                locations.addCondition(wifiName.getText().toString(), combinedFancyStartTime, combinedFancyEndTime, stringDays);
+                locations.addCondition(spinner.getSelectedItem().toString(), combinedFancyStartTime, combinedFancyEndTime, stringDays);
             }
             else{
-                locations.updateConditionById(selectedItem, wifiName.getText().toString(), combinedFancyStartTime, combinedFancyEndTime, stringDays);
+                locations.updateConditionById(selectedItem, spinner.getSelectedItem().toString(), combinedFancyStartTime, combinedFancyEndTime, stringDays);
                 selectedItem = -1;
                 add.setText("Add");
                 Toast.makeText(this, "Successfully edited", Toast.LENGTH_SHORT).show();
@@ -335,12 +333,13 @@ public class MainActivity extends AppCompatActivity {
 
         itemList.setAdapter(simpleCursorAdapter);
 
-        wifiName.setText("");
+        //wifiName.setText("");
         start.setHour(0);
         start.setMinute(0);
         end.setHour(0);
         end.setMinute(0);
         untickCheckBoxes();
+        setSpinner(getSSID(DEFAULT_WIFI_TEXT));
     }
 
     private void untickCheckBoxes() {
