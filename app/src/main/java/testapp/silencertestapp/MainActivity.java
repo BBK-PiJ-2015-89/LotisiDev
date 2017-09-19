@@ -159,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
     private String[] getSSID(String extra) {
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         List<WifiConfiguration> configuredNetworks =  wifiManager.getConfiguredNetworks();
+        if(configuredNetworks!= null){
         String[] ssidArray = new String[configuredNetworks.size()];
         for (int i = 0; i <configuredNetworks.size() ; i++) {
             String temp = configuredNetworks.get(i).SSID;
@@ -169,7 +170,13 @@ public class MainActivity extends AppCompatActivity {
         String[] copiedArray = new String[ssidArray.length+1];
         System.arraycopy(ssidArray, 0, copiedArray, 1, copiedArray.length - 1);
         copiedArray[0] = extra;
-        return copiedArray;
+        return copiedArray;}
+        else{
+            String[] failedArray = new String[2];
+            failedArray[0] = extra;
+            failedArray[1] = "WIFI IS TURNED OFF";
+            return failedArray;
+        }
     }
 
     private int getHour(String hourCombined) {
