@@ -10,9 +10,8 @@
         android:id="@+id/wifinetwork"
         android:layout_width="250dp"
         android:layout_height="49dp"
-        android:layout_marginLeft="-12dp"
+        android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="0dp"
         android:ems="10"
         android:hint="WiFi Network"
         android:inputType="textPersonName"
@@ -22,16 +21,15 @@
 
     <Button
         android:id="@+id/add"
-        android:layout_width="59dp"
+        android:layout_width="88dp"
         android:layout_height="52dp"
         android:text="add"
         android:onClick="add"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="207dp"
-        android:layout_marginRight="0dp"
+        android:layout_marginRight="5dp"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginEnd="5dp"
-        tools:layout_editor_absoluteX="296dp" />
+        android:layout_marginEnd="5dp" />
 
     <TextView
         android:id="@+id/textView"
@@ -53,7 +51,8 @@
         android:text="Start/End Time"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="259dp" />
+        android:layout_marginTop="259dp"
+        android:layout_marginEnd="30dp" />
 
     <android.support.constraint.Guideline
         android:layout_width="wrap_content"
@@ -70,10 +69,11 @@
         android:layout_height="wrap_content"
         android:text="SU"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="243dp"
+        android:layout_marginLeft="241dp"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="216dp"
         android:layout_marginStart="241dp" />
+
 
     <CheckBox
         android:id="@+id/satCheckbox"
@@ -81,7 +81,7 @@
         android:layout_height="wrap_content"
         android:text="S"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="201dp"
+        android:layout_marginLeft="202dp"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="216dp"
         android:layout_marginStart="202dp" />
@@ -92,7 +92,7 @@
         android:layout_height="wrap_content"
         android:text="F"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="160dp"
+        android:layout_marginLeft="162dp"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="216dp"
         android:layout_marginStart="162dp" />
@@ -103,7 +103,7 @@
         android:layout_height="wrap_content"
         android:text="T"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="122dp"
+        android:layout_marginLeft="121dp"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="216dp"
         android:layout_marginStart="121dp" />
@@ -114,7 +114,7 @@
         android:layout_height="wrap_content"
         android:text="W"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="82dp"
+        android:layout_marginLeft="80dp"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="216dp"
         android:layout_marginStart="80dp" />
@@ -125,7 +125,7 @@
         android:layout_height="wrap_content"
         android:text="T"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="40dp"
+        android:layout_marginLeft="42dp"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="216dp"
         android:layout_marginStart="42dp" />
@@ -137,8 +137,7 @@
         android:text="M"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="216dp"
-        android:layout_marginLeft="-2dp" />
+        android:layout_marginTop="216dp" />
 
     <TimePicker
         android:id="@+id/startPicker"
@@ -173,7 +172,9 @@
         app:layout_constraintTop_toTopOf="@+id/startPicker"
         app:layout_constraintLeft_toRightOf="@+id/startPicker"
         android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp" />
+        android:layout_marginStart="8dp"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintBottom_creator="1" />
 
     <TextView
         android:id="@+id/textView5"
@@ -196,7 +197,9 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wifinetwork" />
+        app:layout_constraintTop_toBottomOf="@+id/wifinetwork"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintLeft_creator="1" />
 
     <Button
         android:id="@+id/resetbutton"
@@ -207,7 +210,18 @@
         android:layout_marginTop="8dp"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
-        android:onClick="startService"/>
+        android:onClick="startService"
+        android:layout_marginEnd="8dp" />
+
+    <Spinner
+        android:id="@+id/wiFiSpinner"
+        android:layout_width="240dp"
+        android:layout_height="27dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="-8dp" />
 
 </android.support.constraint.ConstraintLayout>
 

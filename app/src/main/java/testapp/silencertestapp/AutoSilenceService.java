@@ -118,12 +118,7 @@ public class AutoSilenceService extends Service {
     }
 
     private void looper() {
-        executorService.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                check();
-            }
-        }, 0, 1, TimeUnit.MINUTES);
+        executorService.scheduleAtFixedRate(() -> check(), 0, 1, TimeUnit.MINUTES);
     }
 
     private void check() {

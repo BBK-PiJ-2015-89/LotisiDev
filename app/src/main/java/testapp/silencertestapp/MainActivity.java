@@ -1,42 +1,35 @@
 package testapp.silencertestapp;
 
-import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.AudioManager;
-import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.support.annotation.IntegerRes;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.telephony.NeighboringCellInfo;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String WIFI_NAME_KEY = "_wifi_name";
-    public static final String START_TIME_KEY = "_start_time";
-    public static final String END_TIME_KEY = "_end_time";
     private EditText wifiName;
     private TimePicker start;
     private TimePicker end;
@@ -49,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox friday;
     private CheckBox saturday;
     private CheckBox sunday;
+    private Spinner spinner;
+    private WifiManager wifiManager;
 
 
     private long selectedItem = -1;
@@ -76,6 +71,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+
+        /*ArrayAdapter<WifiConfiguration> adapter = ArrayAdapter.createFromResource(this,
+                wifiConfig.getConfiguredNetworks, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);*/
+        spinner = (Spinner) findViewById(R.id.wiFiSpinner);
         wifiName = (EditText) findViewById(R.id.wifinetwork);
         start = (TimePicker) findViewById(R.id.startPicker);
         end = (TimePicker) findViewById(R.id.endPicker);
@@ -91,6 +92,11 @@ public class MainActivity extends AppCompatActivity {
 
         start.setIs24HourView(true);
         end.setIs24HourView(true);
+
+        String[] ssidArray = getSSIDs();
+
+        spinner.setAdapter(new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, ssidArray));
 
         reloadAdapter();
 
@@ -148,15 +154,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        itemList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                displayDialog(l);
-                return true;
-            }
+        itemList.setOnItemLongClickListener((adapterView, view, i, l) -> {
+            displayDialog(l);
+            return true;
         });
+    }
+
+    @NonNull
+    private String[] getSSIDs() {
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        List<WifiConfiguration> configuredNetworks =  wifiManager.getConfiguredNetworks();
+        String[] ssidArray = new String[configuredNetworks.size()];
+        for (int i = 0; i <configuredNetworks.size() ; i++) {
+            String temp = configuredNetworks.get(i).SSID;
+            temp = temp.replace("\"", "");
+            ssidArray[i] = temp;
+        }
+        Arrays.sort(ssidArray);
+        return ssidArray;
     }
 
     private int getHour(String hourCombined) {
@@ -356,12 +371,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener(){
+        builder.setNegativeButton("cancel", (dialogInterface, i) -> {
 
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-            }
         });
 
         builder.setCancelable(false);
@@ -370,30 +381,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void changeToSilence(View view) {
-        final AudioManager myAudioManager;
-        myAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        WifiManager wifiMgr = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-        String name = wifiInfo.getSSID();
-        name = name.replace("\"", ""); //remove ""
-        //Objects.equals(name, "HAVELOCKHOUSE_5G")
-
-        Calendar c = Calendar.getInstance();
-        int day = c.get(Calendar.DAY_OF_WEEK);
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-
-
-        if (myAudioManager.getRingerMode() != AudioManager.RINGER_MODE_SILENT) {
-            myAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-            Toast.makeText(getApplicationContext(), "Silenced", Toast.LENGTH_SHORT).show();
-        } else {
-            myAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-            Toast.makeText(getApplicationContext(), "Reverted back to original normal volume", Toast.LENGTH_SHORT).show();
-
-        }
-
-    }
 
     public void startService(View view) {
 
@@ -406,82 +393,4 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AutoSilenceService.class);
         stopService(intent);
     }
-
-    public void cellTowers(View view) {
-        int NETWORK_TYPE_EDGE = 1; //initialized previously
-        int rssi = 31;
-        NeighboringCellInfo nc = new NeighboringCellInfo(rssi, "FFFFFFF", NETWORK_TYPE_EDGE);
-        System.out.println(nc.getCid());
-
-
-    }
-
-    public void testMethod(View view) {
-
-        final AudioManager myAudioManager;
-        myAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        WifiManager wifiMgr = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-        String name = wifiInfo.getSSID();
-        name = name.replace("\"", ""); //remove ""
-        Boolean setToSilent = false;
-        Calendar c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-        int today = c.get(Calendar.DAY_OF_WEEK);
-
-        ArrayList<HashMap<String, String>> items = new ArrayList<>();
-        ArrayList<Set<Integer>> storedDays = new ArrayList<>();
-
-
-
-
-        Cursor cursor = locations.getAllItems();
-        cursor.moveToFirst();
-        for (int i = 0; i <cursor.getCount() ; i++) {
-            HashMap<String, String> item = new HashMap<>();
-            item.put(WIFI_NAME_KEY, cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
-            item.put(START_TIME_KEY, cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD)));
-            item.put(END_TIME_KEY, cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD)));
-            String tempdays = cursor.getString(cursor.getColumnIndex(Locations.DAYS_OF_WEEK_FIELD));
-            String[] days = tempdays.split(",");
-            Set<Integer> daySet = new HashSet<>();
-            for (String day : days) {
-                daySet.add(Integer.parseInt(day));
-            }
-            storedDays.add(daySet);
-            items.add(item);
-            cursor.moveToNext();
-        }
-        cursor.close();
-
-            for (int i = 0; i < items.size(); i++) {
-
-                String wifiNetworkName = items.get(i).get(WIFI_NAME_KEY);
-                int start_Time = Integer.parseInt(items.get(i).get(START_TIME_KEY));
-                int end_Time = Integer.parseInt(items.get(i).get(END_TIME_KEY));
-                Set<Integer> daySetRetrieved = storedDays.get(i);
-
-                if (start_Time < end_Time && Objects.equals(wifiNetworkName, name) && daySetRetrieved.contains(today)) {
-                    if (start_Time <= hour && hour < end_Time) {
-                        setToSilent = true;
-                    }
-                } else if (hour >= start_Time && Objects.equals(wifiNetworkName, name)) {
-                    if(daySetRetrieved.contains(today)){
-                    setToSilent = true;}
-                } else if (hour < end_Time && Objects.equals(wifiNetworkName, name) && daySetRetrieved.contains(today-1)) {
-                    setToSilent = true;
-                } else {
-                    //do nothing
-                }
-
-        if (setToSilent) {
-            myAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-            Toast.makeText(getApplicationContext(), "Silenced", Toast.LENGTH_SHORT).show();
-        } else if (myAudioManager.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) {
-            myAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-            Toast.makeText(getApplicationContext(), "Reverted back to original normal volume", Toast.LENGTH_SHORT).show();
-        }
-
-    }
-        }
     }
