@@ -1,6 +1,8 @@
 package testapp.silencertestapp;
 
+import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox friday;
     private CheckBox saturday;
     private CheckBox sunday;
+
 
     private long selectedItem = -1;
     private final Locations locations = new Locations(this);
@@ -284,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private int dismantleFancyTime(String combinedTime){
-        return Integer.parseInt(combinedTime.replace(";", ""));
+        return Integer.parseInt(combinedTime.replace(":", ""));
     }
 
     private String createFancyTime(int combinedTime) {
@@ -480,4 +483,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-}}
+        }
+    }

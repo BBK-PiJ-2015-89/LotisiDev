@@ -1,5 +1,9 @@
 package testapp.silencertestapp;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +14,10 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
+import android.service.notification.StatusBarNotification;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -18,6 +25,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.Executors;
@@ -37,29 +45,41 @@ public class AutoSilenceService extends Service {
     //private ScheduledFuture future;
     public static final String START_TIME_KEY = "_start_time";
     public static final String END_TIME_KEY = "_end_time";
-    static int setState = 250;
+    private static int setState = 0;
     private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     private final Locations locations = new Locations(this);
     private final ArrayList<HashMap<String, String>> items = new ArrayList<>();
     private final ArrayList<Set<Integer>> storedDays = new ArrayList<>();
+    private NotificationManager mNotificationManager;
+    public static final int NOTIFICATION = 10002;
+    public static boolean NOTIFICATION_TRACKER;
 
     @Override
     public void onCreate() {
 
     }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startID) {
+        mNotificationManager=  (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        System.out.println(NOTIFICATION_TRACKER);
+        if(NOTIFICATION_TRACKER){
+            mNotificationManager.cancel(NOTIFICATION);
+        }
         System.out.println("starting service");
         locations.openReadOnlyDB();
         Cursor cursor = locations.getAllItems();
+        final AudioManager myAudioManager;
+        myAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        setState = myAudioManager.getRingerMode();
 
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
             HashMap<String, String> item = new HashMap<>();
             item.put(WIFI_NAME_KEY, cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
-            item.put(START_TIME_KEY, cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD)));
-            item.put(END_TIME_KEY, cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD)));
+            String start_Time = dismantleFancyTime(cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD)));
+            item.put(START_TIME_KEY, start_Time);
+            String end_Time = dismantleFancyTime(cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD)));
+            item.put(END_TIME_KEY, end_Time);
             String tempdays = cursor.getString(cursor.getColumnIndex(Locations.DAYS_OF_WEEK_FIELD));
             String[] days = tempdays.split(",");
             Set<Integer> daySet = new HashSet<>();
@@ -74,6 +94,9 @@ public class AutoSilenceService extends Service {
         locations.closeDB();
         looper();
         return START_STICKY;
+    }
+    private String dismantleFancyTime(String combinedTime){
+        return combinedTime.replace(":", "");
     }
 
 
@@ -127,9 +150,6 @@ public class AutoSilenceService extends Service {
 
         System.out.println("running service");
 
-        if (setState == 250) {
-            setState = myAudioManager.getRingerMode();
-        }
         if (setState == myAudioManager.getRingerMode()) {
             for (int i = 0; i < items.size(); i++) {
 
@@ -145,8 +165,10 @@ public class AutoSilenceService extends Service {
                 } else if (hour >= start_Time && Objects.equals(wifiNetworkName, wifiName)) {
                     if(daySetRetrieved.contains(today)){
                         setToSilent = true;}
-                } else if (hour < end_Time && Objects.equals(wifiNetworkName, wifiName) && daySetRetrieved.contains(today-1)) {
-                    setToSilent = true;
+                } else if (hour < end_Time && Objects.equals(wifiNetworkName, wifiName)) {
+                    if(daySetRetrieved.contains(today-1) || (today == 1 && daySetRetrieved.contains(7))){
+                        setToSilent = true;
+                    }
                 } else {
                     //do nothing
                 }
@@ -161,7 +183,30 @@ public class AutoSilenceService extends Service {
             }
         } else {
             System.out.println("changed from set setting");
+            notificationExample();
+
         }
     }
 
+
+    private void notificationExample(){
+        Intent intent = new Intent(this, AutoSilenceService.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        System.out.println("Notification Method");
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_stat_name)
+                        .setContentTitle("Lotisi")
+                        .setContentText("Stopped due to manual change - click to restart")
+                        .setContentIntent(pendingIntent);
+
+                PendingIntent.getActivity(this, 0, new Intent(this, AutoSilenceService.class), 0);
+
+        // notificationID allows you to update the notification later on.
+        mNotificationManager.notify(NOTIFICATION, mBuilder.build());
+        NOTIFICATION_TRACKER = true;
+
+
+
+    }
 }
