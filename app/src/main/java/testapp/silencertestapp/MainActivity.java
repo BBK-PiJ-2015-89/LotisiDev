@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
             temp = temp.replace("\"", "");
             ssidArray[i] = temp;
         }
-        Arrays.sort(ssidArray);
+        Arrays.sort(ssidArray, 1, ssidArray.length, String.CASE_INSENSITIVE_ORDER);
         String[] copiedArray = new String[ssidArray.length+1];
         System.arraycopy(ssidArray, 0, copiedArray, 1, copiedArray.length - 1);
         copiedArray[0] = extra;
