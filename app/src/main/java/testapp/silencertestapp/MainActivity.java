@@ -155,6 +155,11 @@ public class MainActivity extends AppCompatActivity {
                 android.R.layout.simple_spinner_item, ssidArray));
     }
 
+    public void resetSystem(View view) {
+        startService(view);
+        reloadAdapter();
+    }
+
     @NonNull
     private String[] getSSID(String extra) {
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -339,8 +344,6 @@ public class MainActivity extends AppCompatActivity {
                 new int[]{R.id.wifi_network_listview, R.id.start_listview, R.id.end_time_listview},1);
 
         itemList.setAdapter(simpleCursorAdapter);
-
-        //wifiName.setText("");
         start.setHour(0);
         start.setMinute(0);
         end.setHour(0);
@@ -364,17 +367,14 @@ public class MainActivity extends AppCompatActivity {
         builder.setTitle("Alert");
         builder.setMessage("Do you really want to remove this condition?");
         Intent intent = new Intent(this, AutoSilenceService.class);
-        builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //delete
+        builder.setPositiveButton("Remove", (dialogInterface, i) -> {
+            //delete
 
-                locations.removeConditionById(selected);
-                reloadAdapter();
-                Toast.makeText(MainActivity.this, "Removed Condition", Toast.LENGTH_SHORT).show();
-                stopService(intent);
-                startService(intent);
-            }
+            locations.removeConditionById(selected);
+            reloadAdapter();
+            Toast.makeText(MainActivity.this, "Removed Condition", Toast.LENGTH_SHORT).show();
+            stopService(intent);
+            startService(intent);
         });
 
         builder.setNegativeButton("cancel", (dialogInterface, i) -> {
@@ -399,4 +399,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AutoSilenceService.class);
         stopService(intent);
     }
-    }
+
+
+}
