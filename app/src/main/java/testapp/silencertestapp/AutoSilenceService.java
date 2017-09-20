@@ -61,7 +61,6 @@ public class AutoSilenceService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startID) {
         mNotificationManager=  (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        System.out.println(NOTIFICATION_TRACKER);
         if(NOTIFICATION_TRACKER){
             mNotificationManager.cancel(NOTIFICATION);
         }
@@ -142,8 +141,6 @@ public class AutoSilenceService extends Service {
         int hour = (hournow * 100) + minutenow;
         int today = c.get(Calendar.DAY_OF_WEEK);
 
-        System.out.println("running service");
-
         if (setState == myAudioManager.getRingerMode()) {
             for (int i = 0; i < items.size(); i++) {
 
@@ -160,15 +157,14 @@ public class AutoSilenceService extends Service {
                     if(daySetRetrieved.contains(today)){
                         setToSilent = true;}
                 } else if (hour < end_Time && Objects.equals(wifiNetworkName, wifiName)) {
-                    if(daySetRetrieved.contains(today-1) || (today == 1 && daySetRetrieved.contains(7))){
+                    if (daySetRetrieved.contains(today - 1) || (today == 1 && daySetRetrieved.contains(7))) {
                         setToSilent = true;
                     }
-                } else {
-                    //do nothing
                 }
             }
+
             if (setToSilent) {
-                myAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+                myAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
                 setState = myAudioManager.getRingerMode();
 
             } else if (myAudioManager.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) {
@@ -176,7 +172,6 @@ public class AutoSilenceService extends Service {
                 setState = myAudioManager.getRingerMode();
             }
         } else {
-            System.out.println("changed from set setting");
             notificationExample();
 
         }

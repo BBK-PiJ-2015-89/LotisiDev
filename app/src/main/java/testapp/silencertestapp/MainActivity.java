@@ -21,8 +21,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox sunday;
     private Spinner spinner;
     private String DEFAULT_WIFI_TEXT = "Select WiFi Network";
+    private ToggleButton mode_button;
 
 
     private long selectedItem = -1;
@@ -84,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         friday = (CheckBox) findViewById(R.id.friCheckbox);
         saturday = (CheckBox) findViewById(R.id.satCheckbox);
         sunday = (CheckBox) findViewById(R.id.sunCheckbox);
+        mode_button = (ToggleButton) findViewById(R.id.mode_button);
 
         start.setIs24HourView(true);
         end.setIs24HourView(true);
@@ -101,13 +105,14 @@ public class MainActivity extends AppCompatActivity {
 
             String startHourCombined = cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD));
             String endHourCombined = cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD));
-            System.out.println(startHourCombined);
-            System.out.println(endHourCombined);
+
 
             int startTimeIntHour = getHour(startHourCombined);
             int startTimeIntMinute = getMinute(startHourCombined);
             int endTimeIntHour = getHour(endHourCombined);
             int endTimeIntMinute = getMinute(endHourCombined);
+            String mode = cursor.getString(cursor.getColumnIndex(Locations.MODE_FIELD));
+            System.out.println(mode);
 
             String[] wifiNames = getSSID(cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
             setSpinner(wifiNames);
@@ -139,6 +144,10 @@ public class MainActivity extends AppCompatActivity {
             }if(daySet.contains(7)){
                 saturday.setChecked(true);
             }
+
+            if(mode.equals("Vibrate")){
+                mode_button.setChecked(true);
+            }
             add.setText("Edit");
             cursor.close();
             selectedItem = l;
@@ -159,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
         startService(view);
         reloadAdapter();
     }
+
 
     @NonNull
     private String[] getSSID(String extra) {
@@ -269,6 +279,7 @@ public class MainActivity extends AppCompatActivity {
             //------
 
 
+
             int startHour = start.getHour();
             int startMinute = start.getMinute();
             int combinedStartTime = (startHour *100) + startMinute;
@@ -278,13 +289,17 @@ public class MainActivity extends AppCompatActivity {
             int combinedEndTime = (endHour * 100) + endMinute;
             String combinedFancyEndTime = createFancyTime(combinedEndTime);
             String combinedFancyStartTime = createFancyTime(combinedStartTime);
-
+            String mode = "Silence";
+            boolean mode_setting = mode_button.isChecked();
+            if(mode_setting){
+                mode = "Vibrate";
+            }
 
             if(selectedItem == -1){
-                locations.addCondition(spinner.getSelectedItem().toString(), combinedFancyStartTime, combinedFancyEndTime, stringDays);
+                locations.addCondition(spinner.getSelectedItem().toString(), mode, combinedFancyStartTime, combinedFancyEndTime, stringDays);
             }
             else{
-                locations.updateConditionById(selectedItem, spinner.getSelectedItem().toString(), combinedFancyStartTime, combinedFancyEndTime, stringDays);
+                locations.updateConditionById(selectedItem, spinner.getSelectedItem().toString(), mode, combinedFancyStartTime, combinedFancyEndTime, stringDays);
                 selectedItem = -1;
                 add.setText("Add");
                 Toast.makeText(this, "Successfully edited", Toast.LENGTH_SHORT).show();
@@ -340,8 +355,8 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = locations.getAllItems();
 
         SimpleCursorAdapter simpleCursorAdapter = new SimpleCursorAdapter(this,R.layout.listitem,cursor,
-                new String[]{Locations.WIFI_NAME_FIELD, Locations.START_TIME_FIELD, Locations.END_TIME_FIELD},
-                new int[]{R.id.wifi_network_listview, R.id.start_listview, R.id.end_time_listview},1);
+                new String[]{Locations.WIFI_NAME_FIELD, Locations.MODE_FIELD, Locations.START_TIME_FIELD, Locations.END_TIME_FIELD},
+                new int[]{R.id.wifi_network_listview, R.id.mode_listview, R.id.start_listview, R.id.end_time_listview},1);
 
         itemList.setAdapter(simpleCursorAdapter);
         start.setHour(0);
@@ -350,6 +365,7 @@ public class MainActivity extends AppCompatActivity {
         end.setMinute(0);
         untickCheckBoxes();
         setSpinner(getSSID(DEFAULT_WIFI_TEXT));
+        mode_button.setChecked(false);
     }
 
     private void untickCheckBoxes() {

@@ -15,7 +15,7 @@
         android:onClick="add"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="207dp"
-        android:layout_marginRight="69dp"
+        android:layout_marginRight="5dp"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginEnd="5dp" />
 
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:text="WiFi Network Name"
         android:windowSoftInputMode="adjustPan"
-        android:layout_marginLeft="-44dp"
+        android:layout_marginLeft="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginStart="16dp"
         tools:layout_constraintTop_creator="1"
@@ -36,7 +36,7 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="17dp"
-        android:layout_marginRight="93dp"
+        android:layout_marginRight="30dp"
         android:text="Start/End Time"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -47,8 +47,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/guideline3"
-        app:layout_constraintGuide_begin="-39dp"
-        android:orientation="vertical" />
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="-358dp" />
 
     <CheckBox
         android:id="@+id/sunCheckbox"
@@ -56,7 +57,7 @@
         android:layout_height="wrap_content"
         android:text="SU"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="184dp"
+        android:layout_marginLeft="241dp"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="216dp"
         android:layout_marginStart="241dp" />
@@ -68,7 +69,7 @@
         android:layout_height="wrap_content"
         android:text="S"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="140dp"
+        android:layout_marginLeft="202dp"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="216dp"
         android:layout_marginStart="202dp" />
@@ -79,7 +80,7 @@
         android:layout_height="wrap_content"
         android:text="F"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="100dp"
+        android:layout_marginLeft="162dp"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="216dp"
         android:layout_marginStart="162dp" />
@@ -129,7 +130,7 @@
     <TimePicker
         android:id="@+id/startPicker"
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="0dp"
 
         android:timePickerMode="spinner"
         app:layout_constraintHorizontal_bias="0.484"
@@ -139,9 +140,9 @@
         tools:layout_constraintRight_creator="1"
         tools:layout_constraintBottom_creator="1"
         app:layout_constraintBottom_toBottomOf="@+id/textView5"
-        android:layout_marginTop="41dp"
+        android:layout_marginTop="28dp"
         tools:layout_constraintLeft_creator="1"
-        android:layout_marginBottom="39dp"
+        android:layout_marginBottom="27dp"
         app:layout_constraintTop_toTopOf="@+id/resetbutton" />
 
 
@@ -150,9 +151,9 @@
         android:layout_width="200dp"
         android:layout_height="100dp"
 
-        android:layout_marginTop="123dp"
+        android:layout_marginTop="97dp"
         android:timePickerMode="spinner"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.012"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -218,6 +219,19 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp" />
+
+    <ToggleButton
+        android:id="@+id/mode_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
+        android:text="ToggleButton"
+        android:textOff="Silent"
+        android:textOn="Vibrate"
+        app:layout_constraintBottom_toTopOf="@+id/textView5"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintRight_creator="1" />
 
 </android.support.constraint.ConstraintLayout>
 
