@@ -41,10 +41,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class AutoSilenceService extends Service {
     public static final String WIFI_NAME_KEY = "_wifi_name";
-
-    //private ScheduledFuture future;
     public static final String START_TIME_KEY = "_start_time";
     public static final String END_TIME_KEY = "_end_time";
+    public static final String MODE_KEY = "_mode_";
     private static int setState = 0;
     private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     private final Locations locations = new Locations(this);
@@ -76,6 +75,14 @@ public class AutoSilenceService extends Service {
             item.put(WIFI_NAME_KEY, cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
             String start_Time = dismantleFancyTime(cursor.getString(cursor.getColumnIndex(Locations.START_TIME_FIELD)));
             item.put(START_TIME_KEY, start_Time);
+            String mode = cursor.getString(cursor.getColumnIndex(Locations.MODE_FIELD));
+            if(mode.equals("Vibrate")){
+                mode ="1";
+            }
+            else{
+                mode = "0";
+            }
+            item.put(MODE_KEY, mode);
             String end_Time = dismantleFancyTime(cursor.getString(cursor.getColumnIndex(Locations.END_TIME_FIELD)));
             item.put(END_TIME_KEY, end_Time);
             String tempdays = cursor.getString(cursor.getColumnIndex(Locations.DAYS_OF_WEEK_FIELD));
@@ -106,11 +113,8 @@ public class AutoSilenceService extends Service {
 
     @Override
     public void onDestroy() {
-        //Toast.makeText(this, "Auto Silence Stopped", Toast.LENGTH_LONG).show();
         stopSelf();
-        //future.cancel(true);
         executorService.shutdownNow();
-        //System.exit(1);
         super.onDestroy();
 
     }
@@ -121,6 +125,7 @@ public class AutoSilenceService extends Service {
 
     private void check() {
         final AudioManager myAudioManager;
+        int mode= 0;
         myAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         WifiManager wifiMgr = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
@@ -148,6 +153,7 @@ public class AutoSilenceService extends Service {
                 int start_Time = Integer.parseInt(items.get(i).get(START_TIME_KEY));
                 int end_Time = Integer.parseInt(items.get(i).get(END_TIME_KEY));
                 Set<Integer> daySetRetrieved = storedDays.get(i);
+                mode = Integer.parseInt(items.get(i).get(MODE_KEY));
 
                 if (start_Time < end_Time && Objects.equals(wifiNetworkName, wifiName) && daySetRetrieved.contains(today)) {
                     if (start_Time <= hour && hour < end_Time) {
@@ -164,7 +170,7 @@ public class AutoSilenceService extends Service {
             }
 
             if (setToSilent) {
-                myAudioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+                myAudioManager.setRingerMode(mode);
                 setState = myAudioManager.getRingerMode();
 
             } else if (myAudioManager.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) {

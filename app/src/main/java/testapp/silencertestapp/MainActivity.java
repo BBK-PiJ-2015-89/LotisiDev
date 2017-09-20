@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -112,8 +113,6 @@ public class MainActivity extends AppCompatActivity {
             int endTimeIntHour = getHour(endHourCombined);
             int endTimeIntMinute = getMinute(endHourCombined);
             String mode = cursor.getString(cursor.getColumnIndex(Locations.MODE_FIELD));
-            System.out.println(mode);
-
             String[] wifiNames = getSSID(cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
             setSpinner(wifiNames);
             //wifiName.setText(cursor.getString(cursor.getColumnIndex(Locations.WIFI_NAME_FIELD)));
@@ -220,11 +219,9 @@ public class MainActivity extends AppCompatActivity {
         minuteCombined = Integer.toString(dismantleFancyTime(minuteCombined));
         int IntMinute;
         if(minuteCombined.length()==4){
-            System.out.println(minuteCombined  + " this is the end minute combined");
             IntMinute = Integer.parseInt(minuteCombined.substring(2,4));
         }
         else if (minuteCombined.length()==3){
-
             IntMinute = Integer.parseInt(minuteCombined.substring(1,3));
         }
         else if (minuteCombined.length()==2){
@@ -318,14 +315,34 @@ public class MainActivity extends AppCompatActivity {
         else{
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Alert");
-            builder.setMessage("Ensure you have entered a Wifi Network and applied the rule to at least 1 day. You must also ensure your start and end time are not identical.");
+            builder.setMessage("Ensure you have selected a Wifi Network and applied the rule to at least 1 day. You must also ensure your start and end time are not identical. Do not create overlapping duplicate WIFI conditions.");
             builder.setCancelable(true);
+            builder.setNegativeButton("OK", (dialogInterface, i) -> {
+
+            });
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
         }
     }
 
 
+    public void helpSection(View view){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("What does this app do");
+        builder.setMessage("Lotisi puts your phone on silent/vibrate based on the WiFI network you are connected to, day and time of day. Set the conditons as you wish and then press add. Ensure you enable Do Not Disturb permission on launch. ");
+        builder.setCancelable(true);
+        builder.setPositiveButton("Further Help", (dialogInterface, i) -> {
+            //go to external page
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
+            startActivity(browserIntent);
+
+        });
+        builder.setNegativeButton("cancel", (dialogInterface, i) -> {
+
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
     private int dismantleFancyTime(String combinedTime){
         return Integer.parseInt(combinedTime.replace(":", ""));
     }
@@ -415,6 +432,4 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AutoSilenceService.class);
         stopService(intent);
     }
-
-
 }
