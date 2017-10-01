@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SilencerTestApp</string>
+    <string name="app_name">Lotisi</string>
     <string name="stop_service">Stop Service</string>
     <string name="start_service">Start Service</string>
     <string name="celltower">celltower</string>
