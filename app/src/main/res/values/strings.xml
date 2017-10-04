@@ -1,10 +1,23 @@
 <resources>
     <string name="app_name">Lotisi</string>
-    <string name="stop_service">Stop Service</string>
-    <string name="start_service">Start Service</string>
-    <string name="celltower">celltower</string>
-    <string name="wifi_name_here">WiFi Name Here</string>
     <string name="start">Start</string>
     <string name="end">End</string>
     <string name="mode">mode</string>
+    <string name="always">Always</string>
+    <string name="help">Help</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="silent">Silent</string>
+    <string name="reset">Reset</string>
+    <string name="end_time">End Time</string>
+    <string name="start_time">Start Time</string>
+    <string name="Monday">M</string>
+    <string name="Tuesday">T</string>
+    <string name="Wednesday">W</string>
+    <string name="Thursday">T</string>
+    <string name="Friday">F</string>
+    <string name="Saturday">S</string>
+    <string name="Sunday">SU</string>
+    <string name="start_end_time">Start/End Time</string>
+    <string name="wifi_network_name">WiFi Network Name</string>
+    <string name="add">add</string>
 </resources>

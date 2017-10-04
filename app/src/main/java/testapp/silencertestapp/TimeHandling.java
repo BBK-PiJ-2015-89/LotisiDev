@@ -1,9 +1,10 @@
 package testapp.silencertestapp;
 
 /**
- * Created by graemewilkinson on 29/09/2017.
+ * Handles time and converts to different formats
+ *
+ * @author graemewilkinson
  */
-
 public class TimeHandling {
 
     /**

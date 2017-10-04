@@ -7,11 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * Created by graemewilkinson on 26/08/2017.
- */
-
-/**
  * Database class that stores the data from the conditions set within the GUI and listed in ListVIew in MainActivity.
+ *
+ * Influenced by TechThree INFO . (2016, May 29). YouTube. Retrieved from SQLite Example Part 1 and 2: https://www.youtube.com/watch?v=TAio8AlsyZE
+
  */
 public class Locations {
 

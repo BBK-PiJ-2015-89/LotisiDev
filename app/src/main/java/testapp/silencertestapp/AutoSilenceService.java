@@ -25,16 +25,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
-/**
- * Created by graemewilkinson on 01/08/2017.
- */
-
 /**
  * Background service that is persistent and will restart on termination.
  *
  * Background service will run even when app is closed and will check the conditions of the system every 1 minute
  * and make changes if conditions are met.
+ *
+ * Influenced by TechThree INFO. (2015, April 16). YouTube. Retrieved from Background Service: An Introduction: https://www.youtube.com/watch?v=1sechJAZIDY
  *
  * @author graemewilkinson
  *

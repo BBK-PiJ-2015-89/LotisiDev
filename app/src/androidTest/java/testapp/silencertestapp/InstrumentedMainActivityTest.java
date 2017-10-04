@@ -9,6 +9,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(AndroidJUnit4.class)
@@ -19,7 +24,7 @@ public class InstrumentedMainActivityTest {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule =
-            new ActivityTestRule<MainActivity>(MainActivity.class);
+            new ActivityTestRule<>(MainActivity.class);
 
     @Before
     public void createActivity(){
@@ -27,9 +32,24 @@ public class InstrumentedMainActivityTest {
     }
 
     @Test
-    public void checkFancyStuff(){
+    public void checkExtraIsReturned(){
         String[] ssids = testMain.getSSID("First network");
         assertEquals("first network is correct", ssids[0], "First network");
 
+    }
+
+    @Test
+    public void checkSetConvertedToString(){
+        Set<Integer> temp = new HashSet<>();
+        temp.add(1);
+        temp.add(2);
+        temp.add(3);
+        temp.add(4);
+        temp.add(7);
+        String tempString = testMain.setToString(temp);
+        String[] tempArray = tempString.split(",");
+        Arrays.sort(tempArray);
+        String[] expectedResult = {"1","2","3","4","7"};
+        assertArrayEquals("Should return a string \"1,2,3,4,7\"", tempArray, expectedResult);
     }
 }

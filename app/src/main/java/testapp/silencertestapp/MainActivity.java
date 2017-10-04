@@ -37,6 +37,9 @@ import java.util.Set;
  * Android widgets are defined within the top level and defined within @onCreate method so they are
  * available in all areas of the class.
  *
+ * Influenced by TechThree INFO. (2016, May 29). YouTube. Retrieved from ListView Part 1 and 2: https://www.youtube.com/watch?v=ZqdqytdR5fA
+ * and TechThree Info. (2015, April 16). YouTube. Retrieved from ShoppingList Tutorial: https://www.youtube.com/watch?v=SlnaDT0KAfg&t=115s
+ *
  * @author graemewilkinson
  * @version 1.5
  * @since 0.9
@@ -293,12 +296,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             //store days array string result in friendly way
-            String stringDays = days.toString();
-            stringDays = stringDays.replace("[", "");
-            stringDays = stringDays.replace("]", "");
-            stringDays = stringDays.replace(" ", "");
-
-            //------
+            String stringDays = setToString(days);
 
 
 
@@ -349,6 +347,16 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
         }
+    }
+    @VisibleForTesting
+    public String setToString(Set<Integer> days) {
+        String stringDays = days.toString();
+        System.out.println(stringDays
+        );
+        stringDays = stringDays.replace("[", "");
+        stringDays = stringDays.replace("]", "");
+        stringDays = stringDays.replace(" ", "");
+        return stringDays;
     }
 
     /**
